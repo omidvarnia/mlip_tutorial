@@ -1,7 +1,0 @@
-/* Limit sidebar logo size */
-.wy-side-nav-search .wy-nav-top img,
-.wy-side-nav-search .logo,
-.wy-side-nav-search img {
-    max-height: 120px;   /* adjust as needed */
-    width: auto;
-}
