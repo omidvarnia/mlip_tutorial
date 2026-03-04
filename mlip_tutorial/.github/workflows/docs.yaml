@@ -1,0 +1,52 @@
+name: Build and Deploy Sphinx docs to GitHub Pages
+
+on:
+  push:
+    branches: [ main ]   # or 'master' if that's your default branch
+  workflow_dispatch:      # optional: manual trigger from Actions tab
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Pandoc
+        run: sudo apt-get install -y pandoc
+
+      - name: Install documentation dependencies
+        run: |
+          pip install sphinx sphinxcontrib-bibtex nbsphinx sphinx_rtd_theme
+          # If you have extra docs deps, uncomment/adjust:
+          # pip install -r docs/requirements.txt
+
+      - name: Build Sphinx HTML docs
+        working-directory: docs
+        run: |
+          make html
+          # or: sphinx-build -b html . _build/html
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs/_build/html
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
