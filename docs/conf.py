@@ -51,7 +51,8 @@ html_theme_options = {
 }
 
 # -- Options for LaTeX output ------------------------------------------------
-latex_engine = 'lualatex'
+# Use pdflatex as the LaTeX engine
+latex_engine = 'pdflatex'
 
 latex_elements = {
     'papersize': 'a4paper',
@@ -71,6 +72,10 @@ latex_elements = {
 \fancyhf{}
 \fancyhead[L]{\leftmark}
 \fancyfoot[C]{\thepage}
+% All figures live in docs/figures, which is two levels
+% above the LaTeX build directory docs/_build/latex.
+% Make LaTeX search that folder by default.
+\graphicspath{{../../figures/}}
 ''',
 }
 
