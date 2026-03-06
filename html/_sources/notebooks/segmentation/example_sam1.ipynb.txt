@@ -1,0 +1,373 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "id": "27b9fa00",
+   "metadata": {},
+   "source": [
+    "<div style=\"text-align: center;\">\n",
+    "\n",
+    "# Segment Anything Model (SAM1)\n",
+    "\n",
+    "</div>\n",
+    "\n",
+    "**Author**: Dr. Amir Omidvarnia  \n",
+    "**Email**: [a.omidvarnia@fz-juelich.de](mailto:a.omidvarnia@fz-juelich.de)  \n",
+    "**Affiliation**: Forschungszentrum Jülich, Germany  \n",
+    "**Event**: DPG2026 AKPIK tutorial on ML-based image processing for electrochemical applications (7 March 2026)\n",
+    "\n",
+    "---\n",
+    "\n",
+    "## Overview\n",
+    "\n",
+    "This notebook demonstrates zero-shot image segmentation using **SAM1** (Segment Anything Model, Meta AI). SAM1 is a foundation model trained on over 1 billion masks across 11 million images, enabling powerful generalization to novel domains — including electron microscopy images — without any task-specific fine-tuning.\n",
+    "\n",
+    "### Key concepts\n",
+    "\n",
+    "- **Zero-shot segmentation**: SAM1 requires no labeled electrochemical training data. Its broad pretraining allows it to delineate object boundaries in SEM images out of the box.\n",
+    "- **Two usage modes**:\n",
+    "  - **Automatic mask generation** (`SamAutomaticMaskGenerator`): segments all detectable objects in an image, returning a list of candidate masks sorted by area.\n",
+    "  - **Prompt-based segmentation** (`SamPredictor`): segments a specific region guided by a user-provided point, box, or mask prompt — useful for targeting individual particles.\n",
+    "- **Backbone**: ViT-H (Vision Transformer, huge), pretrained by Meta AI on SA-1B.\n",
+    "\n",
+    "### Workflow\n",
+    "\n",
+    "1. Load the ViT-H SAM1 checkpoint (downloaded automatically if absent).\n",
+    "2. Run automatic mask generation on a sample SEM image.\n",
+    "3. Post-process masks: sort by area, combine into a single binary image, and inspect top-ranked regions.\n",
+    "4. Run prompt-based segmentation using a point click to isolate a specific particle.\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "e672b25e",
+   "metadata": {},
+   "source": [
+    "## Environment Setup and Library Imports\n",
+    "\n",
+    "This block imports the core scientific and deep-learning libraries, configures structured logging, and loads the SAM1 package (`segment_anything`) from Meta AI. The `SamAutomaticMaskGenerator` and `SamPredictor` classes provide the two main segmentation interfaces used in this notebook, while `SamModelRegistry` maps model type identifiers to architecture definitions. The repository root is located dynamically so that local project modules can be resolved regardless of where the notebook is launched from.\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import os\n",
+    "import sys\n",
+    "import numpy as np\n",
+    "import matplotlib.pyplot as plt\n",
+    "import logging\n",
+    "import torch\n",
+    "from pathlib import Path\n",
+    "import cv2\n",
+    "\n",
+    "# sam1\n",
+    "from segment_anything import SamAutomaticMaskGenerator, SamPredictor, sam_model_registry\n",
+    "\n",
+    "\n",
+    "logging.basicConfig(\n",
+    "    level=logging.INFO,\n",
+    "    format=\"%(asctime)s - %(message)s\",\n",
+    "    datefmt=\"%d:%m:%Y %H:%M:%S\",\n",
+    ")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Add repo root to sys.path so `import src` resolves to the local 'modules/' package\n",
+    "try:\n",
+    "    notebook_dir = Path(__file__).resolve().parent\n",
+    "except Exception:\n",
+    "    notebook_dir = Path.cwd()\n",
+    "\n",
+    "cur = notebook_dir\n",
+    "repo_root = None\n",
+    "for _ in range(6):\n",
+    "    if (cur / 'src').exists():\n",
+    "        repo_root = cur\n",
+    "        break\n",
+    "    if cur.parent == cur:\n",
+    "        break\n",
+    "    cur = cur.parent\n",
+    "\n",
+    "if repo_root is None:\n",
+    "    repo_root = Path.cwd()\n",
+    "\n",
+    "modules_dir = repo_root / 'src'\n",
+    "repo_root_str = str(repo_root)\n",
+    "if repo_root_str not in sys.path:\n",
+    "    sys.path.insert(0, repo_root_str)\n",
+    "print(f'Added repo root to sys.path: {repo_root_str} (src dir: {modules_dir})')\n",
+    "\n",
+    "# Load configuration from YAML\n",
+    "from src.synth_data_module import ConfigLoader\n",
+    "config_path = repo_root / 'tutorial_parameters.yaml'\n",
+    "config = ConfigLoader(config_path)\n",
+    "\n",
+    "# Specify the test image path (adjust this path as needed)\n",
+    "input_image_path = os.path.join(repo_root, config['sample_images_dir'], '1b935635dd.png')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "device = \"cuda\" if torch.cuda.is_available() else \"mps\" if torch.backends.mps.is_available() else \"cpu\"\n",
+    "print(f\"Using device: {device}\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "1d3ec963",
+   "metadata": {},
+   "source": [
+    "## Downloading and Loading the SAM1 Pretrained Checkpoint\n",
+    "\n",
+    "SAM1 requires a large pretrained checkpoint (~2.5 GB for the ViT-H variant). This section checks whether the checkpoint has already been downloaded to the `Pretrained_models/` directory and fetches it from the official Meta AI release if not. The directory is excluded from version control via `.gitignore` to avoid committing large binary files.\n",
+    "\n",
+    "Once the weights are on disk, the SAM model is instantiated from the registry, an `SamAutomaticMaskGenerator` is created for whole-image segmentation, and the sample SEM image is loaded and decoded as an RGB array ready for inference.\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "model_type = \"vit_h\"\n",
+    "pretrained_model_dir = os.path.join(repo_root, config['pretrained_models_dir'], 'segment_anything1_META')\n",
+    "pretrained_model_path = f\"{pretrained_model_dir}/sam_{model_type}_4b8939.pth\"\n",
+    "pretrained_model_url = \"https://dl.fbaipublicfiles.com/segment_anything/sam_vit_h_4b8939.pth\"\n",
+    "\n",
+    "if not os.path.exists(pretrained_model_dir) and not os.path.exists(pretrained_model_path):\n",
+    "\n",
+    "    os.makedirs(pretrained_model_dir, exist_ok=True)\n",
+    "    os.chdir(pretrained_model_dir)\n",
+    "    os.system(f\"wget {pretrained_model_url}\")\n",
+    "    logging.info(\"Pretrained model sam_vit_h_4b8939.pth downloaded successfully.\")\n",
+    "\n",
+    "else:\n",
+    "\n",
+    "    logging.info(\"Pretrained model already exists.\")\n",
+    "\n",
+    "os.chdir(repo_root)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Load the SAM model\n",
+    "logging.info(f\"Loading SAM model from {pretrained_model_path}\")\n",
+    "sam = sam_model_registry[\"vit_h\"](checkpoint=pretrained_model_path)\n",
+    "logging.info(\"SAM model loaded successfully\")\n",
+    "\n",
+    "# Create an automatic mask generator as a single binary_mask\n",
+    "logging.info(\"Creating automatic mask generator\")\n",
+    "mask_generator = SamAutomaticMaskGenerator(sam)\n",
+    "logging.info(\"Automatic mask generator created successfully\")\n",
+    "\n",
+    "# Load the input image\n",
+    "image = cv2.imread(str(input_image_path))\n",
+    "image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)\n",
+    "\n",
+    "# Generate masks\n",
+    "masks = mask_generator.generate(image)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "081b1c05",
+   "metadata": {},
+   "source": [
+    "## Mask Post-Processing: Sorting, Combining, and Top-K Selection\n",
+    "\n",
+    "SAM1's automatic generator returns a list of masks, each annotated with area, predicted IoU score, and bounding box. This step:\n",
+    "\n",
+    "- **Sorts** all masks by pixel area in descending order, so the largest detected regions appear first.\n",
+    "- **Combines** all masks into a single binary image where every detected object is marked as foreground — useful as a complete particle/background segmentation map.\n",
+    "- **Selects the top-2** largest masks into a separate binary image, isolating the dominant structural regions (e.g., the largest electrochemical particles or electrode layers).\n",
+    "\n",
+    "This post-processing converts the raw list of SAM predictions into actionable segmentation maps for downstream analysis.\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Sort masks by area in descending order\n",
+    "sorted_masks = sorted(masks, key=lambda x: x['area'], reverse=True)\n",
+    "sorted_masks_top2 = sorted_masks[:2] # Get the top 2 masks\n",
+    "\n",
+    "# Make all masks as a single binary image\n",
+    "binary_mask = np.zeros_like(image[:, :, 0])\n",
+    "for mask in masks:\n",
+    "    binary_mask[mask[\"segmentation\"]] = 1\n",
+    "\n",
+    "# Create a binary mask for the top 2 masks\n",
+    "binary_mask_top2 = np.zeros_like(image[:, :, 0])\n",
+    "for mask in sorted_masks_top2:\n",
+    "    binary_mask_top2[mask[\"segmentation\"]] = 1\n",
+    "\n",
+    "logging.info(f\"Generated {len(masks)} masks, with the top 2 masks having areas: {[mask['area'] for mask in sorted_masks_top2]}\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "6f293fbc",
+   "metadata": {},
+   "source": [
+    "## Visualization: Combined Mask and Top-2 Region Comparison\n",
+    "\n",
+    "This panel compares three views of the same SEM image:\n",
+    "\n",
+    "- **Original image**: the raw electron microscopy frame as input to SAM1.\n",
+    "- **Combined binary mask**: all detected segments merged, showing the full coverage of SAM1's automatic predictions across the field of view.\n",
+    "- **Top-2 binary masks**: only the two largest detected regions, highlighting the dominant structural features identified by the model.\n",
+    "\n",
+    "Comparing the combined and top-2 masks reveals whether the most prominent electrochemical structures (e.g., large particles or electrode surfaces) are reliably detected as the highest-area objects.\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "fig, ax = plt.subplots(1, 3, figsize=(15, 5))\n",
+    "ax[0].imshow(image)\n",
+    "ax[0].set_title(\"Original Image\")\n",
+    "ax[0].axis(\"off\")\n",
+    "\n",
+    "ax[1].imshow(binary_mask, cmap=\"gray\")\n",
+    "ax[1].set_title(\"Binary Mask\")\n",
+    "ax[1].axis(\"off\")\n",
+    "\n",
+    "ax[2].imshow(binary_mask_top2, cmap=\"gray\")\n",
+    "ax[2].set_title(\"Top 2 Binary Masks\")\n",
+    "ax[2].axis(\"off\")\n",
+    "\n",
+    "plt.show()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "3583ef93",
+   "metadata": {},
+   "source": [
+    "## Visualization: Per-Mask Grid Inspection\n",
+    "\n",
+    "This section displays each individual mask returned by the automatic generator in a separate panel, arranged in a 5-column grid and ordered from largest (top-left) to smallest (bottom-right) by area.\n",
+    "\n",
+    "Inspecting all masks individually provides insight into:\n",
+    "- The granularity of SAM1's segmentation: whether it splits or merges electrochemical structures.\n",
+    "- The presence of spurious small-area detections that may need filtering.\n",
+    "- Which masks correspond to particles, grain boundaries, or imaging artefacts.\n",
+    "\n",
+    "Empty subplots (if the grid has more panels than masks) are hidden automatically.\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "fig, ax = plt.subplots(len(sorted_masks) // 5 + 1, 5, figsize=(20, len(sorted_masks) // 5 * 5))\n",
+    "for i, mask in enumerate(sorted_masks):\n",
+    "    binary_mask = np.zeros_like(image[:, :, 0])\n",
+    "    binary_mask[mask[\"segmentation\"]] = 1\n",
+    "    row, col = divmod(i, 5)\n",
+    "    ax[row, col].imshow(binary_mask, cmap=\"gray\")\n",
+    "    ax[row, col].set_title(f\"Mask {i}\")\n",
+    "    ax[row, col].axis(\"off\")\n",
+    "\n",
+    "# Hide any unused subplots\n",
+    "for j in range(i + 1, len(ax.flatten())):\n",
+    "    ax.flatten()[j].axis(\"off\")\n",
+    "\n",
+    "plt.show()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "195a8974",
+   "metadata": {},
+   "source": [
+    "## Prompt-Based Segmentation with `SamPredictor`\n",
+    "\n",
+    "While automatic mask generation identifies all detectable objects, **prompt-based segmentation** targets a specific region using a user-supplied coordinate. The `SamPredictor` interface encodes the image once and then efficiently processes any number of point, box, or mask prompts.\n",
+    "\n",
+    "Here, a single foreground point at pixel coordinates `(400, 300)` is passed as the prompt. SAM1 returns a single binary mask delineating the object that contains that point. This approach is ideal for interactively isolating a specific particle or structural feature in an electrochemical micrograph without needing to sift through all automatic predictions.\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Use SamPredictor for prompt-based segmentation\n",
+    "predictor = SamPredictor(sam)\n",
+    "predictor.set_image(image)\n",
+    "\n",
+    "# Define a point prompt (x, y coordinates) and label (1 = foreground, 0 = background)\n",
+    "input_point = np.array([[400, 300]])  # Click at (400, 300)\n",
+    "input_label = np.array([1])  # Label as foreground\n",
+    "\n",
+    "# Generate mask\n",
+    "masks, scores, logits = predictor.predict(\n",
+    "    point_coords=input_point,\n",
+    "    point_labels=input_label,\n",
+    "    multimask_output=False\n",
+    ")\n",
+    "\n",
+    "# Plot result\n",
+    "fig, ax = plt.subplots(1, 2, figsize=(12, 5))\n",
+    "ax[0].imshow(image)\n",
+    "ax[0].plot(input_point[:, 0], input_point[:, 1], 'r*', markersize=20, label='Prompt')\n",
+    "ax[0].legend()\n",
+    "ax[0].set_title(\"Input Image with Point Prompt\")\n",
+    "ax[0].axis(\"off\")\n",
+    "\n",
+    "ax[1].imshow(masks[0], cmap=\"gray\")\n",
+    "ax[1].set_title(\"Segmented Mask\")\n",
+    "ax[1].axis(\"off\")\n",
+    "plt.show()"
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": ".dpg2026 (3.11.11)",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.11.11"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 2
+}

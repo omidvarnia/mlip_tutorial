@@ -1,0 +1,410 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Segment Anything Model (SAM1) &mdash; Machine Learning for Electrochemical Image Processing 1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/nbsphinx-code-cells.css?v=2aa19091" />
+      <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=d8792373" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=f2a433a1"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Machine Learning for Electrochemical Image Processing
+              <img src="../../_static/logo_tutorial.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../image_processing_basics.html">Digital Image Processing Basics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../electrochemical_imaging.html">Electrochemical Imaging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../preprocessing.html">Image Preprocessing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../synthetic_data.html">Synthetic Data Generation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../segmentation.html">Image Segmentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bibliography.html">Bibliography</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Machine Learning for Electrochemical Image Processing</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Segment Anything Model (SAM1)</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/notebooks/segmentation/example_sam1.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div style="text-align: center;"><section id="Segment-Anything-Model-(SAM1)">
+<h1>Segment Anything Model (SAM1)<a class="headerlink" href="#Segment-Anything-Model-(SAM1)" title="Link to this heading"></a></h1>
+</div><div class="line-block">
+<div class="line"><strong>Author</strong>: Dr. Amir Omidvarnia</div>
+<div class="line"><strong>Email</strong>: <a class="reference external" href="mailto:a&#46;omidvarnia&#37;&#52;&#48;fz-juelich&#46;de">a<span>&#46;</span>omidvarnia<span>&#64;</span>fz-juelich<span>&#46;</span>de</a></div>
+<div class="line"><strong>Affiliation</strong>: Forschungszentrum Jülich, Germany</div>
+<div class="line"><strong>Event</strong>: DPG2026 AKPIK tutorial on ML-based image processing for electrochemical applications (7 March 2026)</div>
+</div>
+<hr class="docutils" />
+<section id="Overview">
+<h2>Overview<a class="headerlink" href="#Overview" title="Link to this heading"></a></h2>
+<p>This notebook demonstrates zero-shot image segmentation using <strong>SAM1</strong> (Segment Anything Model, Meta AI). SAM1 is a foundation model trained on over 1 billion masks across 11 million images, enabling powerful generalization to novel domains — including electron microscopy images — without any task-specific fine-tuning.</p>
+<section id="Key-concepts">
+<h3>Key concepts<a class="headerlink" href="#Key-concepts" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Zero-shot segmentation</strong>: SAM1 requires no labeled electrochemical training data. Its broad pretraining allows it to delineate object boundaries in SEM images out of the box.</p></li>
+<li><p><strong>Two usage modes</strong>:</p>
+<ul>
+<li><p><strong>Automatic mask generation</strong> (<code class="docutils literal notranslate"><span class="pre">SamAutomaticMaskGenerator</span></code>): segments all detectable objects in an image, returning a list of candidate masks sorted by area.</p></li>
+<li><p><strong>Prompt-based segmentation</strong> (<code class="docutils literal notranslate"><span class="pre">SamPredictor</span></code>): segments a specific region guided by a user-provided point, box, or mask prompt — useful for targeting individual particles.</p></li>
+</ul>
+</li>
+<li><p><strong>Backbone</strong>: ViT-H (Vision Transformer, huge), pretrained by Meta AI on SA-1B.</p></li>
+</ul>
+</section>
+<section id="Workflow">
+<h3>Workflow<a class="headerlink" href="#Workflow" title="Link to this heading"></a></h3>
+<ol class="arabic simple">
+<li><p>Load the ViT-H SAM1 checkpoint (downloaded automatically if absent).</p></li>
+<li><p>Run automatic mask generation on a sample SEM image.</p></li>
+<li><p>Post-process masks: sort by area, combine into a single binary image, and inspect top-ranked regions.</p></li>
+<li><p>Run prompt-based segmentation using a point click to isolate a specific particle.</p></li>
+</ol>
+</section>
+</section>
+<section id="Environment-Setup-and-Library-Imports">
+<h2>Environment Setup and Library Imports<a class="headerlink" href="#Environment-Setup-and-Library-Imports" title="Link to this heading"></a></h2>
+<p>This block imports the core scientific and deep-learning libraries, configures structured logging, and loads the SAM1 package (<code class="docutils literal notranslate"><span class="pre">segment_anything</span></code>) from Meta AI. The <code class="docutils literal notranslate"><span class="pre">SamAutomaticMaskGenerator</span></code> and <code class="docutils literal notranslate"><span class="pre">SamPredictor</span></code> classes provide the two main segmentation interfaces used in this notebook, while <code class="docutils literal notranslate"><span class="pre">SamModelRegistry</span></code> maps model type identifiers to architecture definitions. The repository root is located dynamically so that local project modules can be resolved regardless of where the notebook
+is launched from.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">cv2</span>
+
+<span class="c1"># sam1</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">segment_anything</span><span class="w"> </span><span class="kn">import</span> <span class="n">SamAutomaticMaskGenerator</span><span class="p">,</span> <span class="n">SamPredictor</span><span class="p">,</span> <span class="n">sam_model_registry</span>
+
+
+<span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span>
+    <span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span>
+    <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">%(asctime)s</span><span class="s2"> - </span><span class="si">%(message)s</span><span class="s2">&quot;</span><span class="p">,</span>
+    <span class="n">datefmt</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">%d</span><span class="s2">:%m:%Y %H:%M:%S&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Add repo root to sys.path so `import src` resolves to the local &#39;modules/&#39; package</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">notebook_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span><span class="o">.</span><span class="n">parent</span>
+<span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+    <span class="n">notebook_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span>
+
+<span class="n">cur</span> <span class="o">=</span> <span class="n">notebook_dir</span>
+<span class="n">repo_root</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">6</span><span class="p">):</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">cur</span> <span class="o">/</span> <span class="s1">&#39;src&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+        <span class="n">repo_root</span> <span class="o">=</span> <span class="n">cur</span>
+        <span class="k">break</span>
+    <span class="k">if</span> <span class="n">cur</span><span class="o">.</span><span class="n">parent</span> <span class="o">==</span> <span class="n">cur</span><span class="p">:</span>
+        <span class="k">break</span>
+    <span class="n">cur</span> <span class="o">=</span> <span class="n">cur</span><span class="o">.</span><span class="n">parent</span>
+
+<span class="k">if</span> <span class="n">repo_root</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">repo_root</span> <span class="o">=</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span>
+
+<span class="n">modules_dir</span> <span class="o">=</span> <span class="n">repo_root</span> <span class="o">/</span> <span class="s1">&#39;src&#39;</span>
+<span class="n">repo_root_str</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">repo_root</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">repo_root_str</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="p">:</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">repo_root_str</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Added repo root to sys.path: </span><span class="si">{</span><span class="n">repo_root_str</span><span class="si">}</span><span class="s1"> (src dir: </span><span class="si">{</span><span class="n">modules_dir</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">)</span>
+
+<span class="c1"># Load configuration from YAML</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">src.synth_data_module</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConfigLoader</span>
+<span class="n">config_path</span> <span class="o">=</span> <span class="n">repo_root</span> <span class="o">/</span> <span class="s1">&#39;tutorial_parameters.yaml&#39;</span>
+<span class="n">config</span> <span class="o">=</span> <span class="n">ConfigLoader</span><span class="p">(</span><span class="n">config_path</span><span class="p">)</span>
+
+<span class="c1"># Specify the test image path (adjust this path as needed)</span>
+<span class="n">input_image_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">repo_root</span><span class="p">,</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;sample_images_dir&#39;</span><span class="p">],</span> <span class="s1">&#39;1b935635dd.png&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">device</span> <span class="o">=</span> <span class="s2">&quot;cuda&quot;</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot;mps&quot;</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">backends</span><span class="o">.</span><span class="n">mps</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot;cpu&quot;</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Using device: </span><span class="si">{</span><span class="n">device</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Downloading-and-Loading-the-SAM1-Pretrained-Checkpoint">
+<h2>Downloading and Loading the SAM1 Pretrained Checkpoint<a class="headerlink" href="#Downloading-and-Loading-the-SAM1-Pretrained-Checkpoint" title="Link to this heading"></a></h2>
+<p>SAM1 requires a large pretrained checkpoint (~2.5 GB for the ViT-H variant). This section checks whether the checkpoint has already been downloaded to the <code class="docutils literal notranslate"><span class="pre">Pretrained_models/</span></code> directory and fetches it from the official Meta AI release if not. The directory is excluded from version control via <code class="docutils literal notranslate"><span class="pre">.gitignore</span></code> to avoid committing large binary files.</p>
+<p>Once the weights are on disk, the SAM model is instantiated from the registry, an <code class="docutils literal notranslate"><span class="pre">SamAutomaticMaskGenerator</span></code> is created for whole-image segmentation, and the sample SEM image is loaded and decoded as an RGB array ready for inference.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model_type</span> <span class="o">=</span> <span class="s2">&quot;vit_h&quot;</span>
+<span class="n">pretrained_model_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">repo_root</span><span class="p">,</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;pretrained_models_dir&#39;</span><span class="p">],</span> <span class="s1">&#39;segment_anything1_META&#39;</span><span class="p">)</span>
+<span class="n">pretrained_model_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">pretrained_model_dir</span><span class="si">}</span><span class="s2">/sam_</span><span class="si">{</span><span class="n">model_type</span><span class="si">}</span><span class="s2">_4b8939.pth&quot;</span>
+<span class="n">pretrained_model_url</span> <span class="o">=</span> <span class="s2">&quot;https://dl.fbaipublicfiles.com/segment_anything/sam_vit_h_4b8939.pth&quot;</span>
+
+<span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">pretrained_model_dir</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">pretrained_model_path</span><span class="p">):</span>
+
+    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">pretrained_model_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">pretrained_model_dir</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;wget </span><span class="si">{</span><span class="n">pretrained_model_url</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Pretrained model sam_vit_h_4b8939.pth downloaded successfully.&quot;</span><span class="p">)</span>
+
+<span class="k">else</span><span class="p">:</span>
+
+    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Pretrained model already exists.&quot;</span><span class="p">)</span>
+
+<span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">repo_root</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Load the SAM model</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Loading SAM model from </span><span class="si">{</span><span class="n">pretrained_model_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">sam</span> <span class="o">=</span> <span class="n">sam_model_registry</span><span class="p">[</span><span class="s2">&quot;vit_h&quot;</span><span class="p">](</span><span class="n">checkpoint</span><span class="o">=</span><span class="n">pretrained_model_path</span><span class="p">)</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;SAM model loaded successfully&quot;</span><span class="p">)</span>
+
+<span class="c1"># Create an automatic mask generator as a single binary_mask</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Creating automatic mask generator&quot;</span><span class="p">)</span>
+<span class="n">mask_generator</span> <span class="o">=</span> <span class="n">SamAutomaticMaskGenerator</span><span class="p">(</span><span class="n">sam</span><span class="p">)</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Automatic mask generator created successfully&quot;</span><span class="p">)</span>
+
+<span class="c1"># Load the input image</span>
+<span class="n">image</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">input_image_path</span><span class="p">))</span>
+<span class="n">image</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">COLOR_BGR2RGB</span><span class="p">)</span>
+
+<span class="c1"># Generate masks</span>
+<span class="n">masks</span> <span class="o">=</span> <span class="n">mask_generator</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Mask-Post-Processing:-Sorting,-Combining,-and-Top-K-Selection">
+<h2>Mask Post-Processing: Sorting, Combining, and Top-K Selection<a class="headerlink" href="#Mask-Post-Processing:-Sorting,-Combining,-and-Top-K-Selection" title="Link to this heading"></a></h2>
+<p>SAM1’s automatic generator returns a list of masks, each annotated with area, predicted IoU score, and bounding box. This step:</p>
+<ul class="simple">
+<li><p><strong>Sorts</strong> all masks by pixel area in descending order, so the largest detected regions appear first.</p></li>
+<li><p><strong>Combines</strong> all masks into a single binary image where every detected object is marked as foreground — useful as a complete particle/background segmentation map.</p></li>
+<li><p><strong>Selects the top-2</strong> largest masks into a separate binary image, isolating the dominant structural regions (e.g., the largest electrochemical particles or electrode layers).</p></li>
+</ul>
+<p>This post-processing converts the raw list of SAM predictions into actionable segmentation maps for downstream analysis.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Sort masks by area in descending order</span>
+<span class="n">sorted_masks</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">masks</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;area&#39;</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">sorted_masks_top2</span> <span class="o">=</span> <span class="n">sorted_masks</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span> <span class="c1"># Get the top 2 masks</span>
+
+<span class="c1"># Make all masks as a single binary image</span>
+<span class="n">binary_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">image</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">])</span>
+<span class="k">for</span> <span class="n">mask</span> <span class="ow">in</span> <span class="n">masks</span><span class="p">:</span>
+    <span class="n">binary_mask</span><span class="p">[</span><span class="n">mask</span><span class="p">[</span><span class="s2">&quot;segmentation&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="mi">1</span>
+
+<span class="c1"># Create a binary mask for the top 2 masks</span>
+<span class="n">binary_mask_top2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">image</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">])</span>
+<span class="k">for</span> <span class="n">mask</span> <span class="ow">in</span> <span class="n">sorted_masks_top2</span><span class="p">:</span>
+    <span class="n">binary_mask_top2</span><span class="p">[</span><span class="n">mask</span><span class="p">[</span><span class="s2">&quot;segmentation&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="mi">1</span>
+
+<span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Generated </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">masks</span><span class="p">)</span><span class="si">}</span><span class="s2"> masks, with the top 2 masks having areas: </span><span class="si">{</span><span class="p">[</span><span class="n">mask</span><span class="p">[</span><span class="s1">&#39;area&#39;</span><span class="p">]</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">mask</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">sorted_masks_top2</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Visualization:-Combined-Mask-and-Top-2-Region-Comparison">
+<h2>Visualization: Combined Mask and Top-2 Region Comparison<a class="headerlink" href="#Visualization:-Combined-Mask-and-Top-2-Region-Comparison" title="Link to this heading"></a></h2>
+<p>This panel compares three views of the same SEM image:</p>
+<ul class="simple">
+<li><p><strong>Original image</strong>: the raw electron microscopy frame as input to SAM1.</p></li>
+<li><p><strong>Combined binary mask</strong>: all detected segments merged, showing the full coverage of SAM1’s automatic predictions across the field of view.</p></li>
+<li><p><strong>Top-2 binary masks</strong>: only the two largest detected regions, highlighting the dominant structural features identified by the model.</p></li>
+</ul>
+<p>Comparing the combined and top-2 masks reveals whether the most prominent electrochemical structures (e.g., large particles or electrode surfaces) are reliably detected as the highest-area objects.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Original Image&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">binary_mask</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;gray&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Binary Mask&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">binary_mask_top2</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;gray&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Top 2 Binary Masks&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Visualization:-Per-Mask-Grid-Inspection">
+<h2>Visualization: Per-Mask Grid Inspection<a class="headerlink" href="#Visualization:-Per-Mask-Grid-Inspection" title="Link to this heading"></a></h2>
+<p>This section displays each individual mask returned by the automatic generator in a separate panel, arranged in a 5-column grid and ordered from largest (top-left) to smallest (bottom-right) by area.</p>
+<p>Inspecting all masks individually provides insight into:</p>
+<ul class="simple">
+<li><p>The granularity of SAM1’s segmentation: whether it splits or merges electrochemical structures.</p></li>
+<li><p>The presence of spurious small-area detections that may need filtering.</p></li>
+<li><p>Which masks correspond to particles, grain boundaries, or imaging artefacts.</p></li>
+</ul>
+<p>Empty subplots (if the grid has more panels than masks) are hidden automatically.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sorted_masks</span><span class="p">)</span> <span class="o">//</span> <span class="mi">5</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">sorted_masks</span><span class="p">)</span> <span class="o">//</span> <span class="mi">5</span> <span class="o">*</span> <span class="mi">5</span><span class="p">))</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">mask</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">sorted_masks</span><span class="p">):</span>
+    <span class="n">binary_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">image</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">])</span>
+    <span class="n">binary_mask</span><span class="p">[</span><span class="n">mask</span><span class="p">[</span><span class="s2">&quot;segmentation&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">row</span><span class="p">,</span> <span class="n">col</span> <span class="o">=</span> <span class="nb">divmod</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+    <span class="n">ax</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">binary_mask</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;gray&quot;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Mask </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
+
+<span class="c1"># Hide any unused subplots</span>
+<span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">ax</span><span class="o">.</span><span class="n">flatten</span><span class="p">())):</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">flatten</span><span class="p">()[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Prompt-Based-Segmentation-with-SamPredictor">
+<h2>Prompt-Based Segmentation with <code class="docutils literal notranslate"><span class="pre">SamPredictor</span></code><a class="headerlink" href="#Prompt-Based-Segmentation-with-SamPredictor" title="Link to this heading"></a></h2>
+<p>While automatic mask generation identifies all detectable objects, <strong>prompt-based segmentation</strong> targets a specific region using a user-supplied coordinate. The <code class="docutils literal notranslate"><span class="pre">SamPredictor</span></code> interface encodes the image once and then efficiently processes any number of point, box, or mask prompts.</p>
+<p>Here, a single foreground point at pixel coordinates <code class="docutils literal notranslate"><span class="pre">(400,</span> <span class="pre">300)</span></code> is passed as the prompt. SAM1 returns a single binary mask delineating the object that contains that point. This approach is ideal for interactively isolating a specific particle or structural feature in an electrochemical micrograph without needing to sift through all automatic predictions.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Use SamPredictor for prompt-based segmentation</span>
+<span class="n">predictor</span> <span class="o">=</span> <span class="n">SamPredictor</span><span class="p">(</span><span class="n">sam</span><span class="p">)</span>
+<span class="n">predictor</span><span class="o">.</span><span class="n">set_image</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+
+<span class="c1"># Define a point prompt (x, y coordinates) and label (1 = foreground, 0 = background)</span>
+<span class="n">input_point</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">400</span><span class="p">,</span> <span class="mi">300</span><span class="p">]])</span>  <span class="c1"># Click at (400, 300)</span>
+<span class="n">input_label</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">])</span>  <span class="c1"># Label as foreground</span>
+
+<span class="c1"># Generate mask</span>
+<span class="n">masks</span><span class="p">,</span> <span class="n">scores</span><span class="p">,</span> <span class="n">logits</span> <span class="o">=</span> <span class="n">predictor</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span>
+    <span class="n">point_coords</span><span class="o">=</span><span class="n">input_point</span><span class="p">,</span>
+    <span class="n">point_labels</span><span class="o">=</span><span class="n">input_label</span><span class="p">,</span>
+    <span class="n">multimask_output</span><span class="o">=</span><span class="kc">False</span>
+<span class="p">)</span>
+
+<span class="c1"># Plot result</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">input_point</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">input_point</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="s1">&#39;r*&#39;</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Prompt&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Input Image with Point Prompt&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">masks</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;gray&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Segmented Mask&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Amir Omidvarnia, Forschungszentrum Jülich GmbH.</p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

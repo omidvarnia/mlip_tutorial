@@ -1,0 +1,307 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Digital Image Processing Basics &mdash; Machine Learning for Electrochemical Image Processing 1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="_static/custom.css?v=d8792373" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=f2a433a1"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Electrochemical Imaging" href="electrochemical_imaging.html" />
+    <link rel="prev" title="Introduction" href="introduction.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Machine Learning for Electrochemical Image Processing
+              <img src="_static/logo_tutorial.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Digital Image Processing Basics</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#what-is-a-digital-image">What Is a Digital Image?</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#key-concepts">Key Concepts</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#histograms">Histograms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#spatial-filtering">Spatial Filtering</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#smoothing-low-pass-filters">Smoothing (Low-Pass) Filters</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#edge-detection">Edge Detection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#image-transformations">Image Transformations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#thresholding-and-binarization">Thresholding and Binarization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#morphological-operations">Morphological Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#connected-components">Connected Components</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#libraries-and-tools">Libraries and Tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="electrochemical_imaging.html">Electrochemical Imaging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="preprocessing.html">Image Preprocessing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="synthetic_data.html">Synthetic Data Generation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="segmentation.html">Image Segmentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bibliography.html">Bibliography</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Machine Learning for Electrochemical Image Processing</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Digital Image Processing Basics</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/image_processing_basics.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="digital-image-processing-basics">
+<span id="image-processing-basics"></span><h1>Digital Image Processing Basics<a class="headerlink" href="#digital-image-processing-basics" title="Link to this heading"></a></h1>
+<p>This section introduces the fundamental concepts of digital image
+processing that underpin all the methods used throughout this tutorial.
+For comprehensive treatments, see <span id="id1">[<a class="reference internal" href="bibliography.html#id3" title="Rafael C. Gonzalez and Richard E. Woods. Digital Image Processing. Pearson, 4th edition, 2018. ISBN 9780133356724.">1</a>]</span> and the
+<a class="reference external" href="https://docs.opencv.org/">OpenCV documentation</a> <span id="id2">[<a class="reference internal" href="bibliography.html#id4" title="Gary Bradski. The OpenCV library. Dr. Dobb's Journal of Software Tools, 2000. URL: https://opencv.org/.">2</a>]</span>.</p>
+<section id="what-is-a-digital-image">
+<h2>What Is a Digital Image?<a class="headerlink" href="#what-is-a-digital-image" title="Link to this heading"></a></h2>
+<p>A <strong>digital image</strong> is a discrete, two-dimensional representation of a
+continuous scene, stored as a rectangular array of numerical values
+called <strong>pixels</strong> (picture elements).</p>
+<p>Formally, a grayscale image is a function:</p>
+<div class="math notranslate nohighlight">
+\[f: \{0, 1, \ldots, M-1\} \times \{0, 1, \ldots, N-1\} \to \{0, 1, \ldots, L-1\}\]</div>
+<p>where <span class="math notranslate nohighlight">\(M \times N\)</span> is the <strong>spatial resolution</strong> (height × width)
+and <span class="math notranslate nohighlight">\(L\)</span> is the number of discrete intensity levels (e.g.,
+<span class="math notranslate nohighlight">\(L = 256\)</span> for 8-bit images).</p>
+<section id="key-concepts">
+<h3>Key Concepts<a class="headerlink" href="#key-concepts" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt><strong>Resolution</strong></dt><dd><p>The number of pixels in each spatial dimension. Higher resolution
+captures finer detail but requires more storage and computation.
+Common resolutions in microscopy range from 512×512 to 4096×4096.</p>
+</dd>
+<dt><strong>Bit Depth</strong></dt><dd><p>The number of bits used to represent each pixel value. Common depths:</p>
+<ul class="simple">
+<li><p><em>8-bit</em>: 256 levels (0–255), standard for display.</p></li>
+<li><p><em>16-bit</em>: 65 536 levels, common in scientific microscopy for
+preserving dynamic range.</p></li>
+<li><p><em>32-bit float</em>: used after processing operations that may produce
+fractional values.</p></li>
+</ul>
+</dd>
+<dt><strong>Color Spaces</strong></dt><dd><ul class="simple">
+<li><p><em>Grayscale</em>: single channel; most scientific microscopy images.</p></li>
+<li><p><em>RGB</em>: three channels (red, green, blue); standard for color images.</p></li>
+<li><p><em>HSV / HSL</em>: hue–saturation–value/lightness; useful for
+color-based segmentation.</p></li>
+<li><p><em>Lab</em>: perceptually uniform; useful for color-difference metrics.</p></li>
+</ul>
+</dd>
+</dl>
+</section>
+</section>
+<section id="histograms">
+<h2>Histograms<a class="headerlink" href="#histograms" title="Link to this heading"></a></h2>
+<p>The <strong>intensity histogram</strong> <span class="math notranslate nohighlight">\(h(r_k)\)</span> counts the number of pixels
+with intensity level <span class="math notranslate nohighlight">\(r_k\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[h(r_k) = \sum_{i=0}^{M-1} \sum_{j=0}^{N-1} \delta(f(i,j) - r_k), \quad k = 0, 1, \ldots, L-1\]</div>
+<p>Histograms reveal the tonal distribution of an image and are the basis
+for several enhancement techniques.</p>
+<p><strong>Histogram equalization</strong> redistributes pixel intensities to achieve a
+roughly uniform histogram, enhancing global contrast:</p>
+<div class="math notranslate nohighlight">
+\[s_k = (L-1) \sum_{j=0}^{k} p_r(r_j)\]</div>
+<p>where <span class="math notranslate nohighlight">\(p_r(r_j) = h(r_j) / (MN)\)</span> is the normalized histogram.</p>
+<p><strong>Contrast Limited Adaptive Histogram Equalization (CLAHE)</strong> applies
+equalization locally within tiles and clips the histogram to avoid
+over-amplifying noise, making it well suited for microscopy images.</p>
+</section>
+<section id="spatial-filtering">
+<h2>Spatial Filtering<a class="headerlink" href="#spatial-filtering" title="Link to this heading"></a></h2>
+<p>Spatial filters operate on a neighborhood of each pixel using a
+<strong>convolution kernel</strong> <span class="math notranslate nohighlight">\(w\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[g(x, y) = (f * w)(x, y) = \sum_{s=-a}^{a} \sum_{t=-b}^{b} w(s, t)\, f(x+s, y+t)\]</div>
+<section id="smoothing-low-pass-filters">
+<h3>Smoothing (Low-Pass) Filters<a class="headerlink" href="#smoothing-low-pass-filters" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Box (mean) filter</strong>: replaces each pixel with the average of its
+neighborhood. Simple but blurs edges.</p></li>
+<li><p><strong>Gaussian filter</strong>: weights neighbors by a Gaussian function,
+providing smoother results with less ringing.</p></li>
+<li><p><strong>Median filter</strong>: replaces each pixel with the median of its
+neighborhood. Highly effective for salt-and-pepper noise while
+preserving edges.</p></li>
+<li><p><strong>Bilateral filter</strong>: edge-preserving smoothing that weights neighbors
+by both spatial distance and intensity similarity.</p></li>
+<li><p><strong>Non-local means (NLM)</strong>: exploits self-similarity across the whole
+image; excellent for Gaussian noise in microscopy
+<span id="id3">[<a class="reference internal" href="bibliography.html#id5" title="Stefan van der Walt, Johannes L. Schönberger, Juan Nunez-Iglesias, François Boulogne, Joshua D. Warner, Neil Yager, Emmanuelle Gouillart, Tony Yu, and the scikit-image contributors. Scikit-image: image processing in Python. PeerJ, 2:e453, 2014. doi:10.7717/peerj.453.">3</a>]</span>.</p></li>
+</ul>
+</section>
+</section>
+<section id="edge-detection">
+<h2>Edge Detection<a class="headerlink" href="#edge-detection" title="Link to this heading"></a></h2>
+<p>Edges correspond to regions of rapid intensity change. Common operators:</p>
+<ul class="simple">
+<li><p><strong>Sobel / Prewitt</strong>: first-order derivative filters for gradient
+magnitude and direction.</p></li>
+<li><p><strong>Laplacian of Gaussian (LoG)</strong>: second-order operator; detects
+zero-crossings.</p></li>
+<li><p><strong>Canny edge detector</strong>: multi-stage pipeline (Gaussian smoothing →
+gradient → non-maximum suppression → hysteresis thresholding);
+widely regarded as optimal for general use.</p></li>
+</ul>
+</section>
+<section id="image-transformations">
+<h2>Image Transformations<a class="headerlink" href="#image-transformations" title="Link to this heading"></a></h2>
+<p><strong>Geometric transformations</strong> map pixel coordinates from one space to
+another:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{pmatrix} x' \\ y' \\ 1 \end{pmatrix}
+= \mathbf{T}
+\begin{pmatrix} x \\ y \\ 1 \end{pmatrix}\end{split}\]</div>
+<p>Common transformations include translation, rotation, scaling, shearing,
+and affine/perspective warping. These are used extensively in data
+augmentation (see <a class="reference internal" href="synthetic_data.html"><span class="doc">Synthetic Data Generation</span></a>).</p>
+<p><strong>Intensity transformations</strong> operate point-wise:</p>
+<ul class="simple">
+<li><p><em>Normalization</em>: rescale intensities to a fixed range, e.g., [0, 1].</p></li>
+<li><p><em>Standardization</em> (z-score): subtract mean and divide by standard
+deviation.</p></li>
+<li><p><em>Gamma correction</em>: <span class="math notranslate nohighlight">\(s = r^\gamma\)</span> adjusts brightness.</p></li>
+<li><p><em>Log transform</em>: <span class="math notranslate nohighlight">\(s = c \log(1 + r)\)</span> compresses dynamic range.</p></li>
+</ul>
+</section>
+<section id="thresholding-and-binarization">
+<h2>Thresholding and Binarization<a class="headerlink" href="#thresholding-and-binarization" title="Link to this heading"></a></h2>
+<p><strong>Thresholding</strong> converts a grayscale image to binary:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}g(x, y) = \begin{cases} 1 &amp; \text{if } f(x,y) \geq T \\ 0 &amp; \text{otherwise} \end{cases}\end{split}\]</div>
+<ul class="simple">
+<li><p><strong>Global (Otsu’s method)</strong>: automatically finds <span class="math notranslate nohighlight">\(T\)</span> by
+maximizing inter-class variance.</p></li>
+<li><p><strong>Adaptive thresholding</strong>: computes <span class="math notranslate nohighlight">\(T\)</span> locally in each region,
+handling non-uniform illumination.</p></li>
+</ul>
+</section>
+<section id="morphological-operations">
+<h2>Morphological Operations<a class="headerlink" href="#morphological-operations" title="Link to this heading"></a></h2>
+<p>Morphological operations process binary (or grayscale) images using a
+<strong>structuring element</strong> <span class="math notranslate nohighlight">\(B\)</span>:</p>
+<ul class="simple">
+<li><p><strong>Erosion</strong>: removes small protrusions; shrinks foreground.</p></li>
+<li><p><strong>Dilation</strong>: fills small holes; expands foreground.</p></li>
+<li><p><strong>Opening</strong> (erosion then dilation): removes small objects.</p></li>
+<li><p><strong>Closing</strong> (dilation then erosion): fills small holes.</p></li>
+<li><p><strong>Watershed</strong>: topology-based algorithm for separating touching objects
+by treating the intensity surface as a landscape and flooding from
+seed points.</p></li>
+</ul>
+</section>
+<section id="connected-components">
+<h2>Connected Components<a class="headerlink" href="#connected-components" title="Link to this heading"></a></h2>
+<p>After binarization, <strong>connected-component labeling</strong> assigns a unique
+integer label to each connected foreground region. This is the standard
+way to count and characterize individual particles or cells in a
+segmented image.</p>
+</section>
+<section id="libraries-and-tools">
+<h2>Libraries and Tools<a class="headerlink" href="#libraries-and-tools" title="Link to this heading"></a></h2>
+<p>This tutorial uses the following Python libraries for image processing:</p>
+<ul class="simple">
+<li><p><strong>OpenCV</strong> <span id="id4">[<a class="reference internal" href="bibliography.html#id4" title="Gary Bradski. The OpenCV library. Dr. Dobb's Journal of Software Tools, 2000. URL: https://opencv.org/.">2</a>]</span> — comprehensive computer-vision
+library with highly optimized C++ back-end.</p></li>
+<li><p><strong>scikit-image</strong> <span id="id5">[<a class="reference internal" href="bibliography.html#id5" title="Stefan van der Walt, Johannes L. Schönberger, Juan Nunez-Iglesias, François Boulogne, Joshua D. Warner, Neil Yager, Emmanuelle Gouillart, Tony Yu, and the scikit-image contributors. Scikit-image: image processing in Python. PeerJ, 2:e453, 2014. doi:10.7717/peerj.453.">3</a>]</span> — Pythonic, NumPy-based
+image processing; excellent for scientific applications.</p></li>
+<li><p><strong>Pillow</strong> — basic image I/O and transformations.</p></li>
+<li><p><strong>NumPy</strong> / <strong>SciPy</strong> — array operations and signal-processing
+utilities.</p></li>
+</ul>
+</section>
+<section id="references">
+<h2>References<a class="headerlink" href="#references" title="Link to this heading"></a></h2>
+<div class="docutils container" id="id6">
+<ul class="simple">
+<li id="id7"><p>Rafael C. Gonzalez and Richard E. Woods. <em>Digital Image Processing</em>. Pearson, 4th edition, 2018. ISBN 9780133356724.</p></li>
+<li id="id8"><p>Gary Bradski. The OpenCV library. <em>Dr. Dobb's Journal of Software Tools</em>, 2000. URL: <a class="reference external" href="https://opencv.org/">https://opencv.org/</a>.</p></li>
+<li id="id9"><p>Stefan van der Walt, Johannes L. Schönberger, Juan Nunez-Iglesias, François Boulogne, Joshua D. Warner, Neil Yager, Emmanuelle Gouillart, Tony Yu, and the scikit-image contributors. Scikit-image: image processing in Python. <em>PeerJ</em>, 2:e453, 2014. <a class="reference external" href="https://doi.org/10.7717/peerj.453">doi:10.7717/peerj.453</a>.</p></li>
+</ul>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="introduction.html" class="btn btn-neutral float-left" title="Introduction" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="electrochemical_imaging.html" class="btn btn-neutral float-right" title="Electrochemical Imaging" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Amir Omidvarnia, Forschungszentrum Jülich GmbH.</p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
