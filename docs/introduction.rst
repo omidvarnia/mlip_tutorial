@@ -79,7 +79,7 @@ How to Use This Tutorial
 All interactive content is provided as Jupyter notebooks. To run the
 notebooks, follow the setup instructions in the repository README:
 
-1. Create a Python 3.11 virtual environment (using `uv <https://docs.astral.sh/uv/>` or
+1. Create a Python 3.11 virtual environment (using `uv <https://docs.astral.sh/uv/>`_ or
    `pyenv <https://github.com/pyenv/pyenv>`_).
 2. Install dependencies from ``requirements.txt``.
 3. Open the notebooks in VS Code or JupyterLab and select the
