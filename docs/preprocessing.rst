@@ -114,4 +114,4 @@ The following Jupyter notebook demonstrates all of these operations on
 real electrochemical microscopy images using OpenCV, scikit-image,
 and NumPy:
 
-- :doc:`Preprocessing basics (notebook) <notebooks/preprocess/preprocessing_basics>`
+- `Preprocessing basics (notebook) <notebooks/preprocess/preprocessing_basics.html>`_
