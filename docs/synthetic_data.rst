@@ -128,13 +128,10 @@ generate stylistic variants of real images.
 Synthetic Data Notebooks
 -------------------------
 
-The following notebooks demonstrate each synthetic data generation
-strategy:
+The following Jupyter notebooks demonstrate each synthetic data
+generation strategy:
 
-.. toctree::
-   :maxdepth: 1
-
-   notebooks/synth_data/example_Aug
-   notebooks/synth_data/example_PB
-   notebooks/synth_data/example_DCGAN
-   notebooks/synth_data/example_SDiff
+- :doc:`Classical augmentation (Aug) <notebooks/synth_data/example_Aug>`
+- :doc:`Physics-based synthesis (PB) <notebooks/synth_data/example_PB>`
+- :doc:`DCGAN-based synthesis <notebooks/synth_data/example_DCGAN>`
+- :doc:`Stable Diffusion image-to-image <notebooks/synth_data/example_SDiff>`

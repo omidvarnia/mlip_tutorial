@@ -110,11 +110,8 @@ After binarization, morphological operations clean up the mask:
 Preprocessing Notebook
 -----------------------
 
-The following notebook demonstrates all of these operations on
+The following Jupyter notebook demonstrates all of these operations on
 real electrochemical microscopy images using OpenCV, scikit-image,
-and NumPy.
+and NumPy:
 
-.. toctree::
-   :maxdepth: 1
-
-   notebooks/preprocess/preprocessing_basics
+- :doc:`Preprocessing basics (notebook) <notebooks/preprocess/preprocessing_basics>`

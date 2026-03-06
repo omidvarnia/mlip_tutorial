@@ -121,14 +121,11 @@ experiments.
 Segmentation Notebooks
 -----------------------
 
-The following notebooks demonstrate each segmentation and tracking
-approach:
+The following Jupyter notebooks demonstrate each segmentation and
+tracking approach:
 
-.. toctree::
-   :maxdepth: 1
-
-   notebooks/segmentation/example_unet
-   notebooks/segmentation/example_sam1
-   notebooks/segmentation/example_sam2
-   notebooks/segmentation/example_nasa_micronet
-   notebooks/segmentation/example_trackpy
+- :doc:`Binary segmentation with U-Net <notebooks/segmentation/example_unet>`
+- :doc:`Segment Anything Model (SAM v1) <notebooks/segmentation/example_sam1>`
+- :doc:`Segment Anything Model 2 (SAM 2) <notebooks/segmentation/example_sam2>`
+- :doc:`NASA MicroNet segmentation <notebooks/segmentation/example_nasa_micronet>`
+- :doc:`Particle tracking with TrackPy <notebooks/segmentation/example_trackpy>`
