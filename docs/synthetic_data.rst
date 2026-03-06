@@ -129,9 +129,9 @@ Synthetic Data Notebooks
 -------------------------
 
 The following Jupyter notebooks demonstrate each synthetic data
-generation strategy:
+generation strategy (hosted on GitHub):
 
-- `Classical augmentation (Aug) <https://github.com/omidvarnia/DPG2026_release>`_
-- `Physics-based synthesis (PB) <https://github.com/omidvarnia/DPG2026_release>`_
-- `DCGAN-based synthesis <https://github.com/omidvarnia/DPG2026_release>`_
-- `Stable Diffusion image-to-image <https://github.com/omidvarnia/DPG2026_release>`_
+- `Classical augmentation (Aug) <https://github.com/omidvarnia/mlip_tutorial/blob/HEAD/notebooks/synth_data/example_Aug.ipynb>`_
+- `Physics-based synthesis (PB) <https://github.com/omidvarnia/mlip_tutorial/blob/HEAD/notebooks/synth_data/example_PB.ipynb>`_
+- `DCGAN-based synthesis <https://github.com/omidvarnia/mlip_tutorial/blob/HEAD/notebooks/synth_data/example_DCGAN.ipynb>`_
+- `Stable Diffusion image-to-image <https://github.com/omidvarnia/mlip_tutorial/blob/HEAD/notebooks/synth_data/example_SDiff.ipynb>`_

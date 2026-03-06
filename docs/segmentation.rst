@@ -122,10 +122,10 @@ Segmentation Notebooks
 -----------------------
 
 The following Jupyter notebooks demonstrate each segmentation and
-tracking approach:
+tracking approach (hosted on GitHub):
 
-- `Binary segmentation with U-Net <https://github.com/omidvarnia/DPG2026_release>`_
-- `Segment Anything Model (SAM v1) <https://github.com/omidvarnia/DPG2026_release>`_
-- `Segment Anything Model 2 (SAM 2) <https://github.com/omidvarnia/DPG2026_release>`_
-- `NASA MicroNet segmentation <https://github.com/omidvarnia/DPG2026_release>`_
-- `Particle tracking with TrackPy <https://github.com/omidvarnia/DPG2026_release>`_
+- `Binary segmentation with U-Net <https://github.com/omidvarnia/mlip_tutorial/blob/HEAD/notebooks/segmentation/example_unet.ipynb>`_
+- `Segment Anything Model (SAM v1) <https://github.com/omidvarnia/mlip_tutorial/blob/HEAD/notebooks/segmentation/example_sam1.ipynb>`_
+- `Segment Anything Model 2 (SAM 2) <https://github.com/omidvarnia/mlip_tutorial/blob/HEAD/notebooks/segmentation/example_sam2.ipynb>`_
+- `NASA MicroNet segmentation <https://github.com/omidvarnia/mlip_tutorial/blob/HEAD/notebooks/segmentation/example_nasa_micronet.ipynb>`_
+- `Particle tracking with TrackPy <https://github.com/omidvarnia/mlip_tutorial/blob/HEAD/notebooks/segmentation/example_trackpy.ipynb>`_
