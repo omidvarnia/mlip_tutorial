@@ -131,7 +131,7 @@ Synthetic Data Notebooks
 The following Jupyter notebooks demonstrate each synthetic data
 generation strategy:
 
-- `Classical augmentation (Aug) <html/notebooks/synth_data/example_Aug.html>`_
-- `Physics-based synthesis (PB) <html/notebooks/synth_data/example_PB.html>`_
-- `DCGAN-based synthesis <html/notebooks/synth_data/example_DCGAN.html>`_
-- `Stable Diffusion image-to-image <html/notebooks/synth_data/example_SDiff.html>`_
+- `Classical augmentation (Aug) <notebooks/synth_data/example_Aug.html>`_
+- `Physics-based synthesis (PB) <notebooks/synth_data/example_PB.html>`_
+- `DCGAN-based synthesis <notebooks/synth_data/example_DCGAN.html>`_
+- `Stable Diffusion image-to-image <notebooks/synth_data/example_SDiff.html>`_
