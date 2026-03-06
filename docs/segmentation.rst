@@ -124,8 +124,8 @@ Segmentation Notebooks
 The following Jupyter notebooks demonstrate each segmentation and
 tracking approach:
 
-- `Binary segmentation with U-Net <rhtml/notebooks/segmentation/example_unet.html>`_
-- `Segment Anything Model (SAM v1) <rhtml/notebooks/segmentation/example_sam1.html>`_
-- `Segment Anything Model 2 (SAM 2) <rhtml/notebooks/segmentation/example_sam2.html>`_
-- `NASA MicroNet segmentation <rhtml/notebooks/segmentation/example_nasa_micronet.html>`_
-- `Particle tracking with TrackPy <rhtml/notebooks/segmentation/example_trackpy.html>`_
+- `Binary segmentation with U-Net <html/notebooks/segmentation/example_unet.html>`_
+- `Segment Anything Model (SAM v1) <html/notebooks/segmentation/example_sam1.html>`_
+- `Segment Anything Model 2 (SAM 2) <html/notebooks/segmentation/example_sam2.html>`_
+- `NASA MicroNet segmentation <html/notebooks/segmentation/example_nasa_micronet.html>`_
+- `Particle tracking with TrackPy <html/notebooks/segmentation/example_trackpy.html>`_

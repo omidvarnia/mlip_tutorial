@@ -39,4 +39,3 @@ Funding
 
 This work is funded by the German Federal Ministry of Education and Research
 (Bundesministerium für Bildung und Forschung, **BMBF**).
-Funding
