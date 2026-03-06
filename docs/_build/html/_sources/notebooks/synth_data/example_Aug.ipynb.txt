@@ -1,0 +1,327 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "<div style=\"text-align: center;\">\n",
+    "\n",
+    "# Standard Augmentation for Synthetic Data Generation\n",
+    "\n",
+    "</div>\n",
+    "\n",
+    "**Author**: Dr. Amir Omidvarnia  \n",
+    "**Email**: a.omidvarnia@fz-juelich.de  \n",
+    "**Affiliation**: Forschungszentrum Jülich, Germany  \n",
+    "**Event**: DPG2026 AKPIK tutorial on ML-based image processing for electrochemical applications (7 March 2026)\n",
+    "\n",
+    "---\n",
+    "\n",
+    "## Overview\n",
+    "\n",
+    "A key challenge in supervised ML-based segmentation of electrochemical images is the scarcity of labeled data. Standard **geometric and photometric augmentation** is the simplest and most widely used strategy to expand a small labeled dataset into a larger, more diverse synthetic training set — without learning a generative model.\n",
+    "\n",
+    "This notebook demonstrates how to apply configurable augmentation (rotation, scaling, shearing, flipping, and intensity perturbations) to a set of real SEM frames and their corresponding binary masks, generating a synthetic dataset where each transformed image–mask pair remains perfectly annotated by construction.\n",
+    "\n",
+    "### Why augmentation works\n",
+    "\n",
+    "- **Label preservation**: geometric transformations applied identically to the image and its mask maintain pixel-level correspondence.\n",
+    "- **Invariance induction**: exposing a segmentation model to augmented variants encourages it to learn features that are invariant to typical imaging variations (viewing angle, illumination, magnification).\n",
+    "- **Low cost**: no training of a generative model is required; augmented samples are generated on the fly or pre-computed.\n",
+    "\n",
+    "### Relationship to other synthesis methods\n",
+    "\n",
+    "This notebook is the simplest of four synthetic data approaches covered in this tutorial:\n",
+    "\n",
+    "| Method | Complexity | Requires real data | Labels |\n",
+    "|--------|------------|-------------------|--------|\n",
+    "| **Standard Augmentation (this notebook)** | Low | Yes | Preserved from real |\n",
+    "| Physics-Based (PB) | Medium | No | Analytically derived |\n",
+    "| DCGAN | High | Yes | GAN-derived |\n",
+    "| Stable Diffusion | Very High | Optional | Diffusion-derived |\n",
+    "\n",
+    "### Repository and Environment Setup\n",
+    "\n",
+    "This section ensures that the analysis is tightly coupled to the local DPG2026 repository so that all subsequent augmentation experiments use an explicitly defined code base and configuration, which is essential for reproducible synthetic data generation studies.\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Add repo root to sys.path so `import src` resolves to the local 'modules/' package\n",
+    "from pathlib import Path\n",
+    "import sys\n",
+    "\n",
+    "try:\n",
+    "    notebook_dir = Path(__file__).resolve().parent\n",
+    "except Exception:\n",
+    "    notebook_dir = Path.cwd()\n",
+    "\n",
+    "cur = notebook_dir\n",
+    "repo_root = None\n",
+    "for _ in range(6):\n",
+    "    if (cur / 'src').exists():\n",
+    "        repo_root = cur\n",
+    "        break\n",
+    "    if cur.parent == cur:\n",
+    "        break\n",
+    "    cur = cur.parent\n",
+    "\n",
+    "if repo_root is None:\n",
+    "    repo_root = Path.cwd()\n",
+    "\n",
+    "modules_dir = repo_root / 'src'\n",
+    "repo_root_str = str(repo_root)\n",
+    "if repo_root_str not in sys.path:\n",
+    "    sys.path.insert(0, repo_root_str)\n",
+    "print(f'Added repo root to sys.path: {repo_root_str} (src dir: {modules_dir})')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Scientific Tooling Overview\n",
+    "This section assembles numerical, imaging, and logging libraries together with the DPG2026 synthesis and preparation modules, defining the basic computational tools used throughout the notebook.\n",
+    "By importing the synthetic data generator and configuration managers at this stage, we conceptually separate the *model of augmentation* from the *experimental protocol*, which makes it easier to analyse how different augmentation strategies affect downstream segmentation performance."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Import necessary modules\n",
+    "import sys\n",
+    "import os\n",
+    "import matplotlib.pyplot as plt\n",
+    "import numpy as np\n",
+    "from PIL import Image\n",
+    "import torch\n",
+    "import logging\n",
+    "\n",
+    "logging.basicConfig(\n",
+    "    level=logging.INFO,\n",
+    "    format='%(asctime)s - %(levelname)s - %(message)s',\n",
+    "    datefmt='%Y-%m-%d %H:%M:%S'\n",
+    ")\n",
+    "\n",
+    "\n",
+    "from src.synth_data_module import SynthDataGenerator\n",
+    "from src.synth_data_module import ConfigLoader\n",
+    "from src.synth_data_module import PreparationManager"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Augmentation Configuration\n",
+    "This step loads the YAML configuration that encodes the statistical model of the augmentation process, including image size, rotation, scaling, shearing ranges and the number of synthetic variants per real frame.\n",
+    "By treating these parameters as part of an explicit experimental design, we can systematically study how the induced distribution of geometric transformations shapes the diversity of synthetic electron microscopy images and the robustness of subsequent segmentation models."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "config_path = repo_root / 'tutorial_parameters.yaml'\n",
+    "\n",
+    "config = ConfigLoader(config_path)\n",
+    "logging.info(f\"Configuration loaded from: {config_path}\")\n",
+    "# Specify dataset and device\n",
+    "dataset = 'SEM'\n",
+    "device = \"cuda\" if torch.cuda.is_available() else \"mps\" if torch.backends.mps.is_available() else \"cpu\"\n",
+    "logging.info(f\"Using device: {device}.\")\n",
+    "method_name = 'Aug'\n",
+    "# Display augmentation parameters\n",
+    "aug_params = config.get_gen_method_params(method_name)\n",
+    "logging.info(\"Augmentation Parameters:\")\n",
+    "logging.info(f\"  Image size: {aug_params['width']}x{aug_params['height']}\")\n",
+    "logging.info(f\"  Rotation range: [{aug_params['min_rotation']}°, {aug_params['max_rotation']}°]\")\n",
+    "logging.info(f\"  Scale range: [{aug_params['min_scale']}, {aug_params['max_scale']}]\")\n",
+    "logging.info(f\"  Shear range: [{aug_params['min_shear']}°, {aug_params['max_shear']}°]\")\n",
+    "logging.info(f\"  Repeats per image: {aug_params['num_repeats_per_image']}\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Data Preparation and Generator Initialization\n",
+    "Here we instantiate the preparation and generation components that connect the abstract augmentation parameters to concrete data on disk, including directories for real images, masks, and synthetic outputs.\n",
+    "By limiting the number of real frames used and routing them through a dedicated generator object, we conceptually frame the augmentation pipeline as a controlled experiment on a well-defined subset of the available electron microscopy data."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Initialize PreparationManager and SynthDataGenerator\n",
+    "prep_manager_aug = PreparationManager(config, dataset, method_name, repo_root=repo_root)\n",
+    "\n",
+    "# Use only 5 real EM frames for creating synthetic images (demonstration only)\n",
+    "N_images = 5\n",
+    "generator_aug = SynthDataGenerator(\n",
+    "    repo_root=repo_root,\n",
+    "    prep_manager=prep_manager_aug,\n",
+    "    config=config,\n",
+    "    method_name=method_name,\n",
+    "    N_images=N_images,\n",
+    "    device=device\n",
+    ")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Synthetic Image Generation\n",
+    "This section triggers the standard augmentation pipeline, in which each selected real electron microscopy frame is transformed according to the configured rotation, scaling and shearing distributions to create physically plausible variants.\n",
+    "Conceptually, this step maps a finite set of experimental observations onto a richer synthetic ensemble, approximating a broader range of imaging conditions while preserving the underlying electrochemical microstructure."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "print(f\"\\nGenerating synthetic images using {method_name}...\")\n",
+    "generator_aug.generate()\n",
+    "print(\"Generation complete!\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Visual Quality Assessment\n",
+    "This section performs a qualitative inspection of the generated synthetic images and their corresponding binary masks to verify that structural features are preserved under augmentation.\n",
+    "By arranging images and masks in a grid, we can visually assess whether the geometric transformations and inpainting operations produce realistic textures and consistent object boundaries, which is critical for training reliable segmentation models."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Get paths to output directories\n",
+    "output_images_dir = prep_manager_aug.output_images_dir\n",
+    "output_masks_dir = prep_manager_aug.output_bin_masks_dir\n",
+    "\n",
+    "# Load generated images\n",
+    "image_files = sorted([f for f in os.listdir(output_images_dir) if f.endswith(('.png', '.jpg'))])[:6]\n",
+    "\n",
+    "# Create visualization\n",
+    "fig, axes = plt.subplots(2, 6, figsize=(18, 6))\n",
+    "fig.suptitle('Augmented Synthetic Images and Masks', fontsize=16, fontweight='bold')\n",
+    "\n",
+    "for idx, img_file in enumerate(image_files):\n",
+    "    # Load image and mask\n",
+    "    img_path = os.path.join(output_images_dir, img_file)\n",
+    "    mask_path = os.path.join(output_masks_dir, img_file)\n",
+    "    \n",
+    "    img = Image.open(img_path)\n",
+    "    mask = Image.open(mask_path)\n",
+    "    \n",
+    "    # Display image\n",
+    "    axes[0, idx].imshow(img, cmap='gray')\n",
+    "    axes[0, idx].set_title(f'Image {idx+1}')\n",
+    "    axes[0, idx].axis('off')\n",
+    "    \n",
+    "    # Display mask\n",
+    "    axes[1, idx].imshow(mask, cmap='gray')\n",
+    "    axes[1, idx].set_title(f'Mask {idx+1}')\n",
+    "    axes[1, idx].axis('off')\n",
+    "\n",
+    "plt.tight_layout()\n",
+    "plt.show()\n",
+    "\n",
+    "print(f\"\\\\nDisplayed {len(image_files)} synthetic images\")\n",
+    "print(f\"Total images generated: {len(os.listdir(output_images_dir))}\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Original–Augmented Comparison\n",
+    "Here we compare one representative original electron microscopy image with a small selection of its augmented counterparts to interpret the geometric and photometric changes introduced by the augmentation process.\n",
+    "This side-by-side visualization clarifies which aspects of the microstructure are preserved (for example particle morphology and interfaces) and which are deliberately perturbed, providing intuition about the invariances that the downstream learning algorithms are encouraged to acquire."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Load preprocessed input images\n",
+    "input_images_dir = prep_manager_aug.input_images_preprocessed_dir\n",
+    "input_files = sorted([f for f in os.listdir(input_images_dir) if f.endswith(('.png', '.jpg'))])\n",
+    "\n",
+    "if input_files:\n",
+    "    # Load original image\n",
+    "    original_img_path = os.path.join(input_images_dir, input_files[0])\n",
+    "    original_img = Image.open(original_img_path)\n",
+    "    \n",
+    "    # Find augmented versions\n",
+    "    base_name = os.path.splitext(input_files[0])[0]\n",
+    "    augmented_files = [f for f in image_files if base_name in f][:2]\n",
+    "    \n",
+    "    # Create comparison plot\n",
+    "    fig, axes = plt.subplots(1, 3, figsize=(16, 4))\n",
+    "    fig.suptitle('Original vs Augmented Comparisons', fontsize=16, fontweight='bold')\n",
+    "    \n",
+    "    # Show original\n",
+    "    axes[0].imshow(original_img, cmap='gray')\n",
+    "    axes[0].set_title('Original Image', fontweight='bold')\n",
+    "    axes[0].axis('off')\n",
+    "    \n",
+    "    # Show augmented versions\n",
+    "    for idx, aug_file in enumerate(augmented_files):\n",
+    "        aug_img_path = os.path.join(output_images_dir, aug_file)\n",
+    "        aug_img = Image.open(aug_img_path)\n",
+    "        axes[idx+1].imshow(aug_img, cmap='gray')\n",
+    "        axes[idx+1].set_title(f'Augmented {idx+1}')\n",
+    "        axes[idx+1].axis('off')\n",
+    "    \n",
+    "    plt.tight_layout()\n",
+    "    plt.show()\n",
+    "else:\n",
+    "    print(\"No input images found for comparison\")"
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": ".dpg2026 (3.11.11)",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.11.11"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 4
+}

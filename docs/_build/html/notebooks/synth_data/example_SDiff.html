@@ -1,0 +1,347 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Stable Diffusion for Synthetic Electrochemical Image Generation &mdash; Machine Learning for Electrochemical Image Processing 1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/nbsphinx-code-cells.css?v=2aa19091" />
+      <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=d8792373" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=f2a433a1"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Machine Learning for Electrochemical Image Processing
+              <img src="../../_static/logo_tutorial.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../image_processing_basics.html">Digital Image Processing Basics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../electrochemical_imaging.html">Electrochemical Imaging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../preprocessing.html">Image Preprocessing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../synthetic_data.html">Synthetic Data Generation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../segmentation.html">Image Segmentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bibliography.html">Bibliography</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Machine Learning for Electrochemical Image Processing</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Stable Diffusion for Synthetic Electrochemical Image Generation</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/notebooks/synth_data/example_SDiff.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div style="text-align: center;"><section id="Stable-Diffusion-for-Synthetic-Electrochemical-Image-Generation">
+<h1>Stable Diffusion for Synthetic Electrochemical Image Generation<a class="headerlink" href="#Stable-Diffusion-for-Synthetic-Electrochemical-Image-Generation" title="Link to this heading"></a></h1>
+</div><div class="line-block">
+<div class="line"><strong>Author</strong>: Dr. Amir Omidvarnia</div>
+<div class="line"><strong>Email</strong>: <a class="reference external" href="mailto:a&#46;omidvarnia&#37;&#52;&#48;fz-juelich&#46;de">a<span>&#46;</span>omidvarnia<span>&#64;</span>fz-juelich<span>&#46;</span>de</a></div>
+<div class="line"><strong>Affiliation</strong>: Forschungszentrum Jülich, Germany</div>
+<div class="line"><strong>Event</strong>: DPG2026 AKPIK tutorial on ML-based image processing for electrochemical applications (7 March 2026)</div>
+</div>
+<hr class="docutils" />
+<section id="Overview">
+<h2>Overview<a class="headerlink" href="#Overview" title="Link to this heading"></a></h2>
+<p><strong>Stable Diffusion</strong> (SD) is a latent diffusion model (LDM) that generates high-resolution images by iteratively denoising a latent representation in a compressed image space learned by a variational autoencoder (VAE). Conditioning on text prompts or reference images guides the denoising trajectory, allowing the model to produce samples that satisfy both the data distribution learned during pretraining and the provided structural or semantic constraints.</p>
+<section id="Why-Stable-Diffusion-for-electrochemical-images?">
+<h3>Why Stable Diffusion for electrochemical images?<a class="headerlink" href="#Why-Stable-Diffusion-for-electrochemical-images?" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>High image quality</strong>: SD produces photorealistic textures and complex structural patterns that simple augmentation or even GANs struggle to match.</p></li>
+<li><p><strong>Image-guided conditioning</strong>: using a real SEM image as a conditioning input, SD can generate structurally related variants — new frames that share the same microstructural motifs but differ in fine-grained detail.</p></li>
+<li><p><strong>Scalability</strong>: a small number of reference images can seed a large and diverse synthetic dataset.</p></li>
+</ul>
+</section>
+<section id="How-synthetic-masks-are-derived">
+<h3>How synthetic masks are derived<a class="headerlink" href="#How-synthetic-masks-are-derived" title="Link to this heading"></a></h3>
+<p>Unlike physics-based generation (which analytically derives masks) or augmentation (which preserves real masks), SD-based synthesis requires a separate step to produce segmentation labels. Masks are typically derived from the diffusion strength or by thresholding the generated images — their quality therefore depends on both the generative model fidelity and the mask-derivation strategy.</p>
+</section>
+<section id="Workflow">
+<h3>Workflow<a class="headerlink" href="#Workflow" title="Link to this heading"></a></h3>
+<ol class="arabic simple">
+<li><p>Load configuration (diffusion hyperparameters: guidance scale, number of inference steps, image resolution, prompt templates).</p></li>
+<li><p>Prepare the input images and initialize the Stable Diffusion generator.</p></li>
+<li><p>Run the denoising pipeline to produce synthetic electrochemical images.</p></li>
+<li><p>Visually inspect the generated images and their derived masks for structural realism.</p></li>
+</ol>
+</section>
+<section id="Goal-of-This-Notebook">
+<h3>Goal of This Notebook<a class="headerlink" href="#Goal-of-This-Notebook" title="Link to this heading"></a></h3>
+<p>This notebook investigates how a Stable Diffusion–based generative model can be adapted to synthesize electron microscopy–like images, enabling controlled exploration of text- and image-guided priors for augmenting electrochemical datasets beyond purely physics-based or GAN-based approaches.</p>
+</section>
+<section id="Experimental-Context-and-Repository-Setup">
+<h3>Experimental Context and Repository Setup<a class="headerlink" href="#Experimental-Context-and-Repository-Setup" title="Link to this heading"></a></h3>
+<p>This cell defines the Stable Diffusion synthesis experiment by specifying the dataset, number of input images, and method name, and by binding the notebook to the local DPG2026 repository so that all subsequent generation uses a version-controlled implementation. From a methodological perspective, it anchors the diffusion-based generative process to a well-defined corpus of electron microscopy data and code, which is essential for reproducible comparisons against physics-based and GAN-based
+generators.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Import necessary modules</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">PIL</span><span class="w"> </span><span class="kn">import</span> <span class="n">Image</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+
+<span class="c1"># !!!!!!!!!!!!!!!!!!!!!! Be careful with the force flag !!!!!!!!!!!!!!!!!!!!!!</span>
+<span class="n">force</span><span class="o">=</span><span class="kc">True</span>  <span class="c1"># Force re-preparation of directories and models</span>
+<span class="c1"># !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!</span>
+
+<span class="c1"># Define method name and number of images for training</span>
+<span class="n">method_name</span> <span class="o">=</span> <span class="s1">&#39;SDiff&#39;</span>
+<span class="n">N_images</span> <span class="o">=</span> <span class="mi">10</span>  <span class="c1"># Number of input images to be synthesized by the model</span>
+<span class="n">dataset</span> <span class="o">=</span> <span class="s1">&#39;SiO2_lithiation&#39;</span>
+
+<span class="c1"># Set the path to include the repository root</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">notebook_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span><span class="o">.</span><span class="n">parent</span>
+<span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+    <span class="n">notebook_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span>
+
+<span class="n">cur</span> <span class="o">=</span> <span class="n">notebook_dir</span>
+<span class="n">repo_root</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">6</span><span class="p">):</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">cur</span> <span class="o">/</span> <span class="s1">&#39;src&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+        <span class="n">repo_root</span> <span class="o">=</span> <span class="n">cur</span>
+        <span class="k">break</span>
+    <span class="k">if</span> <span class="n">cur</span><span class="o">.</span><span class="n">parent</span> <span class="o">==</span> <span class="n">cur</span><span class="p">:</span>
+        <span class="k">break</span>
+    <span class="n">cur</span> <span class="o">=</span> <span class="n">cur</span><span class="o">.</span><span class="n">parent</span>
+
+<span class="k">if</span> <span class="n">repo_root</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">repo_root</span> <span class="o">=</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span>
+
+<span class="n">modules_dir</span> <span class="o">=</span> <span class="n">repo_root</span> <span class="o">/</span> <span class="s1">&#39;src&#39;</span>
+<span class="n">repo_root_str</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">repo_root</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">repo_root_str</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="p">:</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">repo_root_str</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Added repo root to sys.path: </span><span class="si">{</span><span class="n">repo_root_str</span><span class="si">}</span><span class="s1"> (src dir: </span><span class="si">{</span><span class="n">modules_dir</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">)</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">src.synth_data_module</span><span class="w"> </span><span class="kn">import</span> <span class="n">SynthDataGenerator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">src.synth_data_module</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConfigLoader</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">src.synth_data_module</span><span class="w"> </span><span class="kn">import</span> <span class="n">PreparationManager</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Computational-Backend-and-Logging">
+<h3>Computational Backend and Logging<a class="headerlink" href="#Computational-Backend-and-Logging" title="Link to this heading"></a></h3>
+<p>Here we configure logging and select the numerical backend (CPU, GPU, or Apple Silicon accelerators), which determines both the computational budget and the temporal resolution at which we can observe the diffusion process. Fixing the device and logging level in this way turns the Stable Diffusion run into a controlled numerical experiment whose behaviour can be compared across different hardware and parameter settings.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Logging configuration</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span>
+    <span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span>
+    <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%(asctime)s</span><span class="s1"> - </span><span class="si">%(levelname)s</span><span class="s1"> - </span><span class="si">%(message)s</span><span class="s1">&#39;</span><span class="p">,</span>
+    <span class="n">datefmt</span><span class="o">=</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1"> %H:%M:%S&#39;</span>
+<span class="p">)</span>
+
+<span class="c1"># Set device for PyTorch</span>
+<span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">():</span>
+    <span class="n">device</span> <span class="o">=</span> <span class="s2">&quot;cuda&quot;</span>
+<span class="k">elif</span> <span class="n">torch</span><span class="o">.</span><span class="n">backends</span><span class="o">.</span><span class="n">mps</span><span class="o">.</span><span class="n">is_available</span><span class="p">():</span>
+    <span class="n">device</span> <span class="o">=</span> <span class="s2">&quot;mps&quot;</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">device</span> <span class="o">=</span> <span class="s2">&quot;cpu&quot;</span>
+
+<span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Using device: </span><span class="si">{</span><span class="n">device</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+<br/></pre></div>
+</div>
+</div>
+</section>
+<section id="Stable-Diffusion-Configuration">
+<h3>Stable Diffusion Configuration<a class="headerlink" href="#Stable-Diffusion-Configuration" title="Link to this heading"></a></h3>
+<p>This block loads a YAML configuration that encodes Stable Diffusion–specific parameters and global dataset properties, such as image resolution and prompt templates. By treating these entries as explicit experimental factorsrather than hard-coded defaultswe can systematically explore how guidance scale, diffusion strength, and other hyperparameters shape the realism and diversity of the synthesized electrochemical microstructures.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Load configuration from YAML file</span>
+<span class="n">config_path</span> <span class="o">=</span> <span class="n">repo_root</span> <span class="o">/</span> <span class="s1">&#39;tutorial_parameters.yaml&#39;</span>
+<span class="n">config</span> <span class="o">=</span> <span class="n">ConfigLoader</span><span class="p">(</span><span class="n">config_path</span><span class="p">)</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Configuration loaded from: </span><span class="si">{</span><span class="n">config_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Data-Pipeline-and-Generator-Initialization">
+<h3>Data Pipeline and Generator Initialization<a class="headerlink" href="#Data-Pipeline-and-Generator-Initialization" title="Link to this heading"></a></h3>
+<p>In this step, the Stable Diffusion generator is instantiated and connected to preprocessed electron microscopy images, defining how each input frame will be transformed into a small ensemble of synthetic variants. Conceptually, this couples a finite empirical dataset to a powerful latent diffusion model, specifying how structure in the original micrographs is propagated and diversified in the synthetic image space.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Initialize PreparationManager and SynthDataGenerator</span>
+<span class="n">prep_manager_sdiff</span> <span class="o">=</span> <span class="n">PreparationManager</span><span class="p">(</span>
+    <span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">,</span>
+    <span class="n">input_dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">,</span>
+    <span class="n">method_name</span><span class="o">=</span><span class="n">method_name</span><span class="p">,</span>
+    <span class="n">repo_root</span><span class="o">=</span><span class="n">repo_root</span><span class="p">,</span>
+    <span class="n">force</span><span class="o">=</span><span class="n">force</span>
+<span class="p">)</span>
+
+<span class="c1"># Use only 200 training images for demonstration (Stable Diffusion is slow)</span>
+<span class="n">generator</span> <span class="o">=</span> <span class="n">SynthDataGenerator</span><span class="p">(</span>
+    <span class="n">repo_root</span><span class="o">=</span><span class="n">repo_root</span><span class="p">,</span>
+    <span class="n">prep_manager</span><span class="o">=</span><span class="n">prep_manager_sdiff</span><span class="p">,</span>
+    <span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">,</span>
+    <span class="n">method_name</span><span class="o">=</span><span class="n">method_name</span><span class="p">,</span>
+    <span class="n">N_images</span><span class="o">=</span><span class="n">N_images</span><span class="p">,</span>
+    <span class="n">device</span><span class="o">=</span><span class="n">device</span>
+<span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Initialized SynthDataGenerator for </span><span class="si">{</span><span class="n">method_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Using </span><span class="si">{</span><span class="n">N_images</span><span class="si">}</span><span class="s2"> training images&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Note: Stable Diffusion generation may take several minutes...&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Diffusion-Based-Synthesis-Run">
+<h3>Diffusion-Based Synthesis Run<a class="headerlink" href="#Diffusion-Based-Synthesis-Run" title="Link to this heading"></a></h3>
+<p>This section triggers the full Stable Diffusion pipeline, iteratively denoising latent representations conditioned on the input images and prompts to produce electron microscopylike samples. From a theoretical viewpoint, each run corresponds to sampling from an implicit probabilistic model over images, allowing us to explore the range of microstructural patterns that are consistent with both the training data and the chosen textual or structural priors.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Upgrade packages to meet Stable Diffusion requirements</span>
+<span class="c1"># %pip install --upgrade transformers diffusers accelerate</span>
+
+<span class="c1"># Generate synthetic images</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Starting Stable Diffusion generation...&quot;</span><span class="p">)</span>
+<span class="n">generator</span><span class="o">.</span><span class="n">generate</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Generation complete!&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Qualitative-Assessment-of-Diffusion-Outputs">
+<h3>Qualitative Assessment of Diffusion Outputs<a class="headerlink" href="#Qualitative-Assessment-of-Diffusion-Outputs" title="Link to this heading"></a></h3>
+<p>Here we arrange Stable Diffusiongenerated images and their corresponding masks in a grid, enabling visual inspection of whether the synthesized textures and interfaces plausibly resemble electrochemical microstructures. This qualitative assessment is crucial for verifying that the diffusion process respects morphological cues such as particle boundaries and porosity patterns before using the samples for quantitative analysis or downstream learning tasks.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Load and display generated images</span>
+<span class="n">output_images_dir</span> <span class="o">=</span> <span class="n">prep_manager_sdiff</span><span class="o">.</span><span class="n">output_images_dir</span>
+<span class="n">output_masks_dir</span> <span class="o">=</span> <span class="n">prep_manager_sdiff</span><span class="o">.</span><span class="n">output_bin_masks_dir</span>
+
+<span class="c1"># Get list of generated files</span>
+<span class="n">image_files</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">([</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">output_images_dir</span><span class="p">)</span> <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.png&#39;</span><span class="p">)])[:</span><span class="mi">6</span><span class="p">]</span>
+
+<span class="c1"># Create visualization</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">18</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s1">&#39;Stable Diffusion Generated Synthetic Images&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">img_file</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">image_files</span><span class="p">):</span>
+    <span class="c1"># Load image and mask</span>
+    <span class="n">img_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_images_dir</span><span class="p">,</span> <span class="n">img_file</span><span class="p">)</span>
+    <span class="n">mask_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_masks_dir</span><span class="p">,</span> <span class="n">img_file</span><span class="p">)</span>
+
+    <span class="n">img</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">img_path</span><span class="p">))</span>
+    <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">mask_path</span><span class="p">))</span>
+
+    <span class="c1"># Display image</span>
+    <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;gray&#39;</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Synth </span><span class="si">{</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;off&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Display mask</span>
+    <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;gray&#39;</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Mask </span><span class="si">{</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;off&#39;</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Displayed </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">image_files</span><span class="p">)</span><span class="si">}</span><span class="s2"> synthetic images&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Total images generated: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">output_images_dir</span><span class="p">))</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Amir Omidvarnia, Forschungszentrum Jülich GmbH.</p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

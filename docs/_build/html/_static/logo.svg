@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="60" viewBox="0 0 200 60">
+  <rect width="200" height="60" fill="#2980B9" rx="4"/>
+  <text x="10" y="22" font-family="Arial, sans-serif" font-size="13" font-weight="bold" fill="white">ML for Electrochemical</text>
+  <text x="10" y="40" font-family="Arial, sans-serif" font-size="13" font-weight="bold" fill="white">Image Processing</text>
+  <text x="10" y="55" font-family="Arial, sans-serif" font-size="9" fill="#BDE3F7">Forschungszentrum Jülich</text>
+</svg>

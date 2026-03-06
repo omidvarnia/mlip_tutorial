@@ -1,0 +1,245 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Synthetic Data Generation &mdash; Machine Learning for Electrochemical Image Processing 1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="_static/custom.css?v=d8792373" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=f2a433a1"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Image Segmentation" href="segmentation.html" />
+    <link rel="prev" title="Image Preprocessing" href="preprocessing.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Machine Learning for Electrochemical Image Processing
+              <img src="_static/logo_tutorial.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="image_processing_basics.html">Digital Image Processing Basics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="electrochemical_imaging.html">Electrochemical Imaging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="preprocessing.html">Image Preprocessing</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Synthetic Data Generation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#why-synthetic-data">Why Synthetic Data?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#classical-augmentation">Classical Augmentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#physics-based-synthesis">Physics-Based Synthesis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#deep-convolutional-gan-dcgan">Deep Convolutional GAN (DCGAN)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#stable-diffusion-image-to-image">Stable Diffusion Image-to-Image</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#synthetic-data-notebooks">Synthetic Data Notebooks</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="segmentation.html">Image Segmentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bibliography.html">Bibliography</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Machine Learning for Electrochemical Image Processing</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Synthetic Data Generation</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/synthetic_data.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="synthetic-data-generation">
+<span id="synthetic-data"></span><h1>Synthetic Data Generation<a class="headerlink" href="#synthetic-data-generation" title="Link to this heading"></a></h1>
+<p>A fundamental challenge in applying supervised machine learning to
+scientific microscopy is the <strong>scarcity of labeled data</strong>. Pixel-level
+annotation (semantic segmentation masks) of microscopy images requires
+expert knowledge and is extremely time-consuming. Synthetic data
+generation offers strategies to produce large annotated datasets
+efficiently.</p>
+<section id="why-synthetic-data">
+<h2>Why Synthetic Data?<a class="headerlink" href="#why-synthetic-data" title="Link to this heading"></a></h2>
+<p>Training robust segmentation models typically requires hundreds or
+thousands of annotated images. Several strategies exist to meet this
+requirement:</p>
+<ol class="arabic simple">
+<li><p><strong>Classical augmentation</strong>: apply label-preserving transformations to
+existing annotated images to artificially expand the dataset.</p></li>
+<li><p><strong>Physics-based synthesis</strong>: build a computational model of the
+imaging process and generate images analytically, with ground-truth
+masks known by construction.</p></li>
+<li><p><strong>Generative models (GANs)</strong>: train a neural network to learn the
+distribution of real images and sample new synthetic examples.</p></li>
+<li><p><strong>Diffusion-based synthesis</strong>: use large pretrained text-to-image or
+image-to-image diffusion models to generate realistic variations.</p></li>
+</ol>
+<p>Each approach has different trade-offs between realism, diversity,
+computational cost, and annotation effort.</p>
+</section>
+<section id="classical-augmentation">
+<h2>Classical Augmentation<a class="headerlink" href="#classical-augmentation" title="Link to this heading"></a></h2>
+<p>Data augmentation applies deterministic or random transformations to
+each training image and its corresponding mask <span id="id1">[<a class="reference internal" href="bibliography.html#id17" title="Connor Shorten and Taghi M. Khoshgoftaar. A survey on image data augmentation for deep learning. Journal of Big Data, 6(1):60, 2019. doi:10.1186/s40537-019-0197-0.">4</a>]</span>.
+Because the transformations are applied equally to both image and mask,
+no new annotation is required.</p>
+<p><strong>Geometric transforms</strong>:</p>
+<ul class="simple">
+<li><p>Random horizontal / vertical flip</p></li>
+<li><p>Random rotation (arbitrary angle or restricted to multiples of 90°)</p></li>
+<li><p>Random scaling (zoom in / out)</p></li>
+<li><p>Random translation (shift)</p></li>
+<li><p>Elastic deformation: locally random displacement fields that simulate
+tissue or material deformation</p></li>
+<li><p>Perspective / affine warping</p></li>
+</ul>
+<p><strong>Intensity transforms</strong>:</p>
+<ul class="simple">
+<li><p>Random brightness and contrast adjustment</p></li>
+<li><p>Random gamma correction</p></li>
+<li><p>Gaussian noise addition</p></li>
+<li><p>Random blur (Gaussian, motion)</p></li>
+<li><p>Cutout / random erasing: randomly masking rectangular regions to
+simulate occlusion</p></li>
+</ul>
+<p>Libraries such as <code class="docutils literal notranslate"><span class="pre">albumentations</span></code> and <code class="docutils literal notranslate"><span class="pre">torchvision.transforms</span></code>
+provide high-performance, composable augmentation pipelines.</p>
+</section>
+<section id="physics-based-synthesis">
+<h2>Physics-Based Synthesis<a class="headerlink" href="#physics-based-synthesis" title="Link to this heading"></a></h2>
+<p>Physics-based synthesis places parameterized particle models onto real
+or procedurally generated backgrounds. Because the object positions and
+shapes are known by construction, ground-truth segmentation masks are
+automatically available.</p>
+<p>Typical workflow:</p>
+<ol class="arabic simple">
+<li><p>Acquire a set of representative background images (empty substrate,
+binder phase, etc.).</p></li>
+<li><p>Define a particle model: shape (circle, ellipse, polygon), size
+distribution, contrast, edge-blur radius.</p></li>
+<li><p>Randomly sample particle parameters from the defined distributions.</p></li>
+<li><p>Composite particles onto backgrounds using alpha blending.</p></li>
+<li><p>Record the binary mask of each particle.</p></li>
+</ol>
+<p>This approach is related to <strong>domain randomization</strong>
+<span id="id2">[<a class="reference internal" href="bibliography.html#id16" title="Josh Tobin, Rachel Fong, Alex Ray, Jonas Schneider, Wojciech Zaremba, and Pieter Abbeel. Domain randomization for transferring deep neural networks from simulation to the real world. In 2017 IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS), 23–30. 2017. doi:10.1109/IROS.2017.8202133.">5</a>]</span>, which deliberately over-randomizes simulation
+parameters to force the trained model to generalize across a broad
+range of conditions.</p>
+</section>
+<section id="deep-convolutional-gan-dcgan">
+<h2>Deep Convolutional GAN (DCGAN)<a class="headerlink" href="#deep-convolutional-gan-dcgan" title="Link to this heading"></a></h2>
+<p>Generative Adversarial Networks (GANs) <span id="id3">[<a class="reference internal" href="bibliography.html#id14" title="Ian Goodfellow, Jean Pouget-Abadie, Mehdi Mirza, Bing Xu, David Warde-Farley, Sherjil Ozair, Aaron Courville, and Yoshua Bengio. Generative adversarial nets. In Advances in Neural Information Processing Systems, volume 27. 2014.">6</a>]</span>
+train a <strong>generator</strong> network <span class="math notranslate nohighlight">\(G\)</span> and a <strong>discriminator</strong>
+network <span class="math notranslate nohighlight">\(D\)</span> in an adversarial game:</p>
+<div class="math notranslate nohighlight">
+\[\min_G \max_D \; \mathbb{E}_{x \sim p_{\text{data}}}[\log D(x)]
++ \mathbb{E}_{z \sim p_z}[\log(1 - D(G(z)))]\]</div>
+<p>The DCGAN architecture <span id="id4">[<a class="reference internal" href="bibliography.html#id15" title="Alec Radford, Luke Metz, and Soumith Chintala. Unsupervised representation learning with deep convolutional generative adversarial networks. arXiv preprint arXiv:1511.06434, 2015. URL: https://arxiv.org/abs/1511.06434.">7</a>]</span> uses convolutional
+layers in both networks, enabling high-quality image synthesis.
+Once trained, the generator can sample arbitrarily many synthetic
+images by feeding random noise vectors <span class="math notranslate nohighlight">\(z \sim p_z\)</span>.</p>
+<p><strong>Limitations</strong>: GAN training is notoriously unstable (mode collapse,
+vanishing gradients); the generated images may not be paired with
+segmentation masks without additional work (e.g., paired cGAN).</p>
+</section>
+<section id="stable-diffusion-image-to-image">
+<h2>Stable Diffusion Image-to-Image<a class="headerlink" href="#stable-diffusion-image-to-image" title="Link to this heading"></a></h2>
+<p>Diffusion models <span id="id5">[<a class="reference internal" href="bibliography.html#id13" title="Patrick von Platen, Suraj Patil, Anton Lozhkov, Pedro Cuenca, Nathan Lambert, Kashif Rasul, Mishig Davaadorj, and Thomas Wolf. Diffusers: state-of-the-art diffusion models. https://github.com/huggingface/diffusers, 2022.">8</a>]</span> learn to reverse a
+gradual noising process, iteratively denoising a Gaussian noise sample
+into a high-fidelity image.</p>
+<p><strong>Image-to-image synthesis</strong> conditions the denoising on an existing
+input image and a text prompt:</p>
+<ol class="arabic simple">
+<li><p>Encode the input image into a latent representation.</p></li>
+<li><p>Add a controlled amount of Gaussian noise (strength parameter).</p></li>
+<li><p>Run the denoising diffusion process conditioned on text and the
+noisy latent.</p></li>
+<li><p>Decode the resulting latent to image space.</p></li>
+</ol>
+<p>This produces a new image that retains the overall structure of the
+input while incorporating diversity specified by the prompt and
+strength parameter. In the context of microscopy, this can be used to
+generate stylistic variants of real images.</p>
+</section>
+<section id="synthetic-data-notebooks">
+<h2>Synthetic Data Notebooks<a class="headerlink" href="#synthetic-data-notebooks" title="Link to this heading"></a></h2>
+<p>The following Jupyter notebooks demonstrate each synthetic data
+generation strategy:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="rhtml/notebooks/synth_data/example_Aug.html">Classical augmentation (Aug)</a></p></li>
+<li><p><a class="reference external" href="rhtml/notebooks/synth_data/example_PB.html">Physics-based synthesis (PB)</a></p></li>
+<li><p><a class="reference external" href="rhtml/notebooks/synth_data/example_DCGAN.html">DCGAN-based synthesis</a></p></li>
+<li><p><a class="reference external" href="rhtml/notebooks/synth_data/example_SDiff.html">Stable Diffusion image-to-image</a></p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="preprocessing.html" class="btn btn-neutral float-left" title="Image Preprocessing" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="segmentation.html" class="btn btn-neutral float-right" title="Image Segmentation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Amir Omidvarnia, Forschungszentrum Jülich GmbH.</p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

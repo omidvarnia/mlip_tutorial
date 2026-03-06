@@ -1,0 +1,236 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Image Preprocessing &mdash; Machine Learning for Electrochemical Image Processing 1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="_static/custom.css?v=d8792373" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=f2a433a1"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Synthetic Data Generation" href="synthetic_data.html" />
+    <link rel="prev" title="Electrochemical Imaging" href="electrochemical_imaging.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Machine Learning for Electrochemical Image Processing
+              <img src="_static/logo_tutorial.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="image_processing_basics.html">Digital Image Processing Basics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="electrochemical_imaging.html">Electrochemical Imaging</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Image Preprocessing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#why-preprocess">Why Preprocess?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#key-preprocessing-operations">Key Preprocessing Operations</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#normalization-and-standardization">Normalization and Standardization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#denoising">Denoising</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#contrast-enhancement">Contrast Enhancement</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#background-correction">Background Correction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#edge-detection-and-gradient-images">Edge Detection and Gradient Images</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#binarization-and-thresholding">Binarization and Thresholding</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#morphological-post-processing">Morphological Post-Processing</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#preprocessing-notebook">Preprocessing Notebook</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="synthetic_data.html">Synthetic Data Generation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="segmentation.html">Image Segmentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bibliography.html">Bibliography</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Machine Learning for Electrochemical Image Processing</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Image Preprocessing</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/preprocessing.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="image-preprocessing">
+<span id="preprocessing"></span><h1>Image Preprocessing<a class="headerlink" href="#image-preprocessing" title="Link to this heading"></a></h1>
+<p>Preprocessing is the first and often most critical step in any
+image-analysis pipeline. Its goal is to enhance image quality, reduce
+noise and artifacts, and bring images into a consistent format before
+feeding them to downstream algorithms or machine-learning models.</p>
+<section id="why-preprocess">
+<h2>Why Preprocess?<a class="headerlink" href="#why-preprocess" title="Link to this heading"></a></h2>
+<p>Raw microscopy images suffer from a range of degradations:</p>
+<ul class="simple">
+<li><p><strong>Non-uniform illumination</strong>: the background intensity varies across
+the field of view due to shadowing, beam profile, or detector
+inhomogeneity.</p></li>
+<li><p><strong>Noise</strong>: shot noise at low beam currents, detector read noise, and
+scan noise all reduce image quality.</p></li>
+<li><p><strong>Low contrast</strong>: compositionally similar phases may differ by only a
+few grey levels.</p></li>
+<li><p><strong>Scale inconsistency</strong>: images from different sessions may be
+acquired at different magnifications and with different intensity
+calibrations.</p></li>
+</ul>
+<p>Effective preprocessing mitigates these issues and ensures that
+subsequent algorithms see consistent, well-conditioned data.</p>
+</section>
+<section id="key-preprocessing-operations">
+<h2>Key Preprocessing Operations<a class="headerlink" href="#key-preprocessing-operations" title="Link to this heading"></a></h2>
+<section id="normalization-and-standardization">
+<h3>Normalization and Standardization<a class="headerlink" href="#normalization-and-standardization" title="Link to this heading"></a></h3>
+<p><strong>Min-max normalization</strong> rescales intensities to [0, 1]:</p>
+<div class="math notranslate nohighlight">
+\[f_{\text{norm}}(x,y) = \frac{f(x,y) - f_{\min}}{f_{\max} - f_{\min}}\]</div>
+<p><strong>Z-score standardization</strong> removes the mean and scales to unit variance:</p>
+<div class="math notranslate nohighlight">
+\[f_{\text{std}}(x,y) = \frac{f(x,y) - \mu}{\sigma}\]</div>
+<p>Both operations are essential when combining images from different
+acquisition sessions or instruments.</p>
+</section>
+<section id="denoising">
+<h3>Denoising<a class="headerlink" href="#denoising" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Gaussian smoothing</strong>: fast and simple; blurs both noise and edges.
+Appropriate when spatial resolution is not critical.</p></li>
+<li><p><strong>Median filtering</strong>: preserves edges while removing impulsive
+(salt-and-pepper) noise.</p></li>
+<li><p><strong>Bilateral filtering</strong>: edge-preserving smoothing; useful when
+structural boundaries must be maintained.</p></li>
+<li><p><strong>Non-local means (NLM)</strong>: exploits self-similarity across the image;
+particularly effective for Gaussian noise in microscopy images at the
+cost of higher computation.</p></li>
+</ul>
+</section>
+<section id="contrast-enhancement">
+<h3>Contrast Enhancement<a class="headerlink" href="#contrast-enhancement" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Histogram equalization</strong>: redistributes intensities globally for
+uniform contrast.</p></li>
+<li><p><strong>CLAHE</strong> (Contrast Limited Adaptive Histogram Equalization): applies
+local equalization with histogram clipping to avoid noise
+amplification. Preferred for SEM/TEM images with non-uniform
+illumination.</p></li>
+<li><p><strong>Gamma correction</strong>: non-linear brightness adjustment.</p></li>
+</ul>
+</section>
+<section id="background-correction">
+<h3>Background Correction<a class="headerlink" href="#background-correction" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Rolling-ball / top-hat transform</strong>: estimates and subtracts a
+slowly varying background using morphological operations.</p></li>
+<li><p><strong>Flat-field correction</strong>: divides by a reference image acquired
+under the same conditions without the sample.</p></li>
+</ul>
+</section>
+<section id="edge-detection-and-gradient-images">
+<h3>Edge Detection and Gradient Images<a class="headerlink" href="#edge-detection-and-gradient-images" title="Link to this heading"></a></h3>
+<p>Edge images highlight structural boundaries and are useful as auxiliary
+inputs to segmentation models or for quality-control inspection.
+Common operators: Sobel, Prewitt, Scharr, Canny (see
+<a class="reference internal" href="image_processing_basics.html"><span class="doc">Digital Image Processing Basics</span></a>).</p>
+</section>
+<section id="binarization-and-thresholding">
+<h3>Binarization and Thresholding<a class="headerlink" href="#binarization-and-thresholding" title="Link to this heading"></a></h3>
+<p>Converting a grayscale image to a binary mask separates foreground
+(particles, pores) from background. Otsu’s method automatically
+selects the optimal global threshold; adaptive thresholding handles
+non-uniform illumination.</p>
+</section>
+<section id="morphological-post-processing">
+<h3>Morphological Post-Processing<a class="headerlink" href="#morphological-post-processing" title="Link to this heading"></a></h3>
+<p>After binarization, morphological operations clean up the mask:</p>
+<ul class="simple">
+<li><p><strong>Opening</strong>: removes small foreground fragments (noise).</p></li>
+<li><p><strong>Closing</strong>: fills small holes in particles.</p></li>
+<li><p><strong>Fill holes</strong>: fills enclosed background regions.</p></li>
+<li><p><strong>Remove small objects</strong>: discards connected components below a
+minimum area threshold.</p></li>
+</ul>
+</section>
+</section>
+<section id="preprocessing-notebook">
+<h2>Preprocessing Notebook<a class="headerlink" href="#preprocessing-notebook" title="Link to this heading"></a></h2>
+<p>The following Jupyter notebook demonstrates all of these operations on
+real electrochemical microscopy images using OpenCV, scikit-image,
+and NumPy:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="rhtml/notebooks/preprocess/preprocessing_basics.html">Preprocessing basics (notebook)</a></p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="electrochemical_imaging.html" class="btn btn-neutral float-left" title="Electrochemical Imaging" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="synthetic_data.html" class="btn btn-neutral float-right" title="Synthetic Data Generation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Amir Omidvarnia, Forschungszentrum Jülich GmbH.</p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
