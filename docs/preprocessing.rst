@@ -112,6 +112,6 @@ Preprocessing Notebook
 
 The following Jupyter notebook demonstrates all of these operations on
 real electrochemical microscopy images using OpenCV, scikit-image,
-and NumPy (hosted on GitHub):
+and NumPy:
 
-- `Preprocessing basics (notebook) <https://github.com/omidvarnia/mlip_tutorial/blob/HEAD/notebooks/preprocess/preprocessing_basics.ipynb>`_
+- `Preprocessing basics (notebook) <rhtml/notebooks/preprocess/preprocessing_basics.html>`_

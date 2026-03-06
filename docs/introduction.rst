@@ -92,5 +92,7 @@ Repository
 ----------
 
 The source code and notebooks are available at:
-`https://github.com/omidvarnia/DPG2026_release
-<https://github.com/omidvarnia/DPG2026_release>`_
+`https://github.com/omidvarnia/dpg2026_mlip_tutorial
+
+<https://github.com/omidvarnia/dpg2026_mlip_tutorial
+>`_
