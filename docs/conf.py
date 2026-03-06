@@ -43,6 +43,7 @@ html_static_path = ['_static']
 html_logo = '_static/logo_tutorial.png'
 html_css_files = ['custom.css']
 html_show_sphinx = False
+html_show_sourcelink = False
 
 html_theme_options = {
     'navigation_depth': 4,
@@ -72,10 +73,8 @@ latex_elements = {
 \fancyhf{}
 \fancyhead[L]{\leftmark}
 \fancyfoot[C]{\thepage}
-% All figures live in docs/figures, which is two levels
-% above the LaTeX build directory docs/_build/latex.
-% Make LaTeX search that folder by default.
-\graphicspath{{../../figures/}}
+% Show sections and subsections in the table of contents
+\setcounter{tocdepth}{2}
 ''',
 }
 
@@ -157,4 +156,7 @@ latex_elements['maketitle'] = r'''
 {\large DPG 2026 -- AKPIK Session\\Dresden, March 2026\par}
 \vspace{1cm}
 \end{titlepage}
+\clearpage
+\tableofcontents
+\clearpage
 '''
